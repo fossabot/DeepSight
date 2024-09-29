@@ -1,0 +1,43 @@
+services:
+    deepsight-db:
+        container_name: deepsight-db
+        image: bitnami/postgresql:latest
+        restart: unless-stopped
+        ports:
+            - 5432:5432/tcp
+        volumes:
+            - db_data:/bitnami/postgresql
+        environment:
+            - POSTGRESQL_USERNAME=deepsight
+            - POSTGRESQL_PASSWORD=<YOUR_PASSWORD>
+            - POSTGRESQL_DATABASE=deepsight-db
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "deepsight"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    deepsight-api:
+        container_name: deepsight-api
+        image: spirax/deepsight-backend:latest
+        restart: unless-stopped
+        ports:
+            - 8000:8000/tcp
+        env_file:
+            - .env
+        depends_on:
+            deepsight-db:
+                condition: service_healthy
+
+    deepsight-frontend:
+        container_name: deepsight-frontend
+        image: spirax/deepsight-frontend:latest
+        restart: unless-stopped
+        ports:
+            - 3000:3000/tcp
+        depends_on:
+            - deepsight-api
+
+volumes:
+    db_data:
+
