@@ -27,3 +27,4 @@ if [ "$DEBUG" = "True" ]; then
 else
   echo "Running server in PRODUCTION mode"
   gunicorn deepsight.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+fi
