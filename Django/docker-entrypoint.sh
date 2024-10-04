@@ -18,13 +18,13 @@ echo "Applying database migrations"
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
-echo "Creating superuser"
+echo "Creating superuser: $DJANGO_SUPERUSER_USERNAME"
 python manage.py createsuperuser --noinput
 
-if [ "$DEBUG" = "True" ]; then
-  echo "Running server in DEBUG mode"
-  python manage.py runserver
-else
+if [ -z "$DEBUG" ]; then
   echo "Running server in PRODUCTION mode"
   gunicorn deepsight.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+else
+  echo "Running server in DEBUG mode"
+  python manage.py runserver
 fi

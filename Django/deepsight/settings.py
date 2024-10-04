@@ -137,6 +137,12 @@ CORS_ALLOW_METHODS = [
     "DELETE",
 ]
 
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    "az-pune.spirax.me",
+    "deepsight.spirax.me",
+]
+
 # REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
