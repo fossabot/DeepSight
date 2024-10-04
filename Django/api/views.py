@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -59,9 +60,12 @@ def register(request):
 
 @api_view(["POST"])
 def login(request):
-    user = JWTAuthentication().authenticate(request)
+    if not request.data.get("username") or not request.data.get("password"):
+        return response(False, "Missing Fields", {}, 400)
+    
+    user = authenticate(request, username=request.data["username"], password=request.data["password"])
     if user is not None:
-        refresh = RefreshToken.for_user(user[0])
+        refresh = RefreshToken.for_user(user)
         return response(
             True,
             "User logged in successfully!",
