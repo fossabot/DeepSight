@@ -7,8 +7,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deepsight.settings")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 def immutable_file_test(path):
     return True
+
 
 application = BlackNoise(
     get_asgi_application(),
