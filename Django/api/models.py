@@ -77,7 +77,7 @@ class ProcessedImage(models.Model):
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     theme = models.CharField(
-        max_length=10,
+        max_length=13,
         choices=[
             ("light", "Light"),
             ("dark", "Dark"),
