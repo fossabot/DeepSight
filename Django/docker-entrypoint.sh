@@ -18,5 +18,8 @@ echo "Applying database migrations"
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
+echo "Creating superuser"
+python manage.py createsuperuser --noinput
+
 echo "Starting server"
 gunicorn deepsight.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000

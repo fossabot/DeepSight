@@ -7,10 +7,8 @@ services:
             - 5432:5432/tcp
         volumes:
             - db_data:/bitnami/postgresql
-        environment:
-            - POSTGRESQL_USERNAME=deepsight
-            - POSTGRESQL_PASSWORD=<YOUR_PASSWORD>
-            - POSTGRESQL_DATABASE=deepsight-db
+        env_file:
+            - .env
         healthcheck:
             test: ["CMD", "pg_isready", "-U", "deepsight"]
             interval: 5s

@@ -73,10 +73,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "deepsight-db",
-        "HOST": os.environ.get("DB_HOST"),
-        "PORT": os.environ.get("DB_PORT"),
-        "USER": "deepsight",
-        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("POSTGRESQL_DATABASE"),
+        "PORT": "5432",
+        "USER": os.environ.get("POSTGRESQL_USERNAME"),
+        "PASSWORD": os.environ.get("POSTGRESQL_PASSWORD"),
     }
 }
 
@@ -154,9 +154,6 @@ REST_FRAMEWORK = {
 
 # Simple JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-    "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
-    "SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER": timedelta(days=1),
-    "SLIDING_TOKEN_LIFETIME_LATE_USER": timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
