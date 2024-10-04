@@ -10,7 +10,7 @@ from .serializers import (
     ModelSerializer,
     ModelCategorySerializer,
 )
-from .utils import response
+from .utils import *
 
 
 def home(request):
@@ -26,6 +26,11 @@ def register(request):
     """
     Registers a new user.
     """
+    if not validate_email(request.data.get("email")):
+        return response(False, "Invalid email address.", {}, 400)
+    if not validate_password(request.data.get("password")):
+        return response(False, "Invalid password.", {}, 400)
+                        
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
