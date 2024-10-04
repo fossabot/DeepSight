@@ -5,8 +5,14 @@ from .models import User, Image, Model, ModelCategory, ProcessedImage, UserSetti
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password"]
+        fields = ["id", "username", "email", "first_name", "last_name", "password"]
         extra_kwargs = {"password": {"write_only": True}}
+
+    def update(self, instance, validated_data): 
+        password = validated_data.pop("password", None)
+        if password:
+            instance.set_password(password) 
+        return super().update(instance, validated_data)
 
     def create(self, validated_data):
         password = validated_data.pop("password")

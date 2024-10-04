@@ -7,7 +7,6 @@ def response(success, message, data, status=200):
         {"success": success, "message": message, "data": data}, status=status
     )
 
-
 def validate_email(email):
     pattern = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
     return re.match(pattern, email) is not None

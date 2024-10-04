@@ -141,6 +141,7 @@ def image(request, image_id):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def model_categories(request):
     """
     Lists all model categories
@@ -153,6 +154,7 @@ def model_categories(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def models(request):
     """
     Lists all models
@@ -163,6 +165,7 @@ def models(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def model_details(request, model_id):
     """
     Retrieves a model.
