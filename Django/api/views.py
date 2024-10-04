@@ -61,7 +61,7 @@ def register(request):
 def login(request):
     user = JWTAuthentication().authenticate(request)
     if user is not None:
-        refresh = RefreshToken.for_user(user)
+        refresh = RefreshToken.for_user(user[0])
         return response(
             True,
             "User logged in successfully!",
