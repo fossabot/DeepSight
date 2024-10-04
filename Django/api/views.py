@@ -139,9 +139,9 @@ def image(request, image_id):
 
 
 @api_view(["GET"])
-def model_category(request):
+def model_categories(request):
     """
-    Lists all model categories or creates a new one.
+    Lists all model categories
     """
     categories = ModelCategory.objects.all()
     serializer = ModelCategorySerializer(categories, many=True)

@@ -16,10 +16,10 @@ urlpatterns = [
     path("image/<int:image_id>", views.image, name="image"),
 
     # Model Category Related
-    path("model_category", views.model_category, name="model_category"),
+    path("model_category", views.model_categories, name="model_category"),
 
     # Model Related
-    path("model", views.model, name="model"),
+    path("model", views.models, name="model"),
     path("model/<int:model_id>", views.model_details, name="model_detail"),
 
     # Processed Image Related
