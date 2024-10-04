@@ -139,8 +139,8 @@ CORS_ALLOW_METHODS = [
 
 # CSRF
 CSRF_TRUSTED_ORIGINS = [
-    "az-pune.spirax.me",
-    "deepsight.spirax.me",
+    "https://az-pune.spirax.me",
+    "https://deepsight.spirax.me",
 ]
 
 # REST Framework
