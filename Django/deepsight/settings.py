@@ -73,7 +73,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "deepsight-db",
-        "HOST": os.environ.get("POSTGRESQL_DATABASE"),
+        "HOST": "deepsight-db",
         "PORT": "5432",
         "USER": os.environ.get("POSTGRESQL_USERNAME"),
         "PASSWORD": os.environ.get("POSTGRESQL_PASSWORD"),
