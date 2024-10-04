@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Image, Model, ModelCategory
@@ -22,6 +22,7 @@ def health(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny]) 
 def register(request):
     """
     Registers a new user.
@@ -48,6 +49,7 @@ def register(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login(request):
     """
     Logs in an existing user.
