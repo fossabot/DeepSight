@@ -3,9 +3,7 @@ import re
 
 
 def response(success, message, data, status=200):
-    return JsonResponse(
-        {"success": success, "message": message, "data": data}, status=status
-    )
+    return JsonResponse({"success": success, "message": message, "data": data}, status=status)
 
 
 def validate_email(email):

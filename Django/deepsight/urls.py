@@ -7,7 +7,5 @@ urlpatterns = [
     path("", RedirectView.as_view(url="/api/v1/", permanent=True)),
     path("health", RedirectView.as_view(url="/api/v1/health", permanent=True)),
     path("django/admin/", admin.site.urls),
-    path(
-        "favicon.ico", RedirectView.as_view(url="/static/favicon.ico", permanent=True)
-    ),
+    path("favicon.ico", RedirectView.as_view(url="/static/favicon.ico", permanent=True)),
 ]
