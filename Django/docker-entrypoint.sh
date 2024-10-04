@@ -21,10 +21,10 @@ python manage.py migrate --noinput
 echo "Creating superuser: $DJANGO_SUPERUSER_USERNAME"
 python manage.py createsuperuser --noinput
 
-if [ -z "$DEBUG" ]; then
+if [ "$DEBUG" = "1" ]; then
+  echo "Running server in DEBUG mode"
+  python manage.py runserver 0.0.0.0:8000
+else
   echo "Running server in PRODUCTION mode"
   gunicorn deepsight.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-else
-  echo "Running server in DEBUG mode"
-  python manage.py runserver
 fi
