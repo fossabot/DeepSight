@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    groups = models.ManyToManyField("auth.Group", related_name="api_users")
+    groups = models.ManyToManyField("auth.Group", related_name="deepsight_users")
     user_permissions = models.ManyToManyField(
-        "auth.Permission", related_name="api_users"
+        "auth.Permission", related_name="deepsight_api_users"
     )
 
     def __str__(self):
@@ -74,7 +74,7 @@ class ProcessedImage(models.Model):
         return f"Processed Image (Original: {self.image}, Model: {self.model})"
 
 
-class UserSettings(models.Model):
+class UserSetting(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     theme = models.CharField(
         max_length=13,

@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Image, Model, ModelCategory
@@ -13,25 +13,23 @@ from .serializers import (
 from .utils import *
 
 
+@api_view(["GET"])
 def home(request):
     return response(True, "Welcome to the DeepSight API!", {}, 200)
 
 
+@api_view(["GET"])
 def health(request):
     return response(True, "API is healthy!", {}, 200)
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
 def register(request):
-    """
-    Registers a new user.
-    """
-    if not validate_email(request.data.get("email")):
-        return response(False, "Invalid email address.", {}, 400)
-    if not validate_password(request.data.get("password")):
-        return response(False, "Invalid password.", {}, 400)
-
+    if not request.data.get("username") or not request.data.get("first_name") or not request.data.get("last_name"):
+        return response(False, "Missing Fields", {}, 400)
+    if not validate_email(request.data.get("email")) or not validate_password(request.data.get("password")):
+        return response(False, "Invalid Request", {}, 400)
+    
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
@@ -49,11 +47,7 @@ def register(request):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
 def login(request):
-    """
-    Logs in an existing user.
-    """
     username = request.data.get("username")
     password = request.data.get("password")
     user = authenticate(request, username=username, password=password)
@@ -75,9 +69,6 @@ def login(request):
 @api_view(["GET", "PUT"])
 @permission_classes([IsAuthenticated])
 def user(request):
-    """
-    Retrieves or updates user information.
-    """
     user = request.user
 
     if request.method == "GET":
@@ -97,9 +88,6 @@ def user(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def upload_image(request):
-    """
-    Uploads a new image.
-    """
     data = request.data.copy()
     data["user"] = request.user.id
     serializer = ImageSerializer(data=data)
@@ -112,9 +100,6 @@ def upload_image(request):
 @api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def image(request, image_id):
-    """
-    Retrieves, updates, or deletes an image.
-    """
     try:
         image = Image.objects.get(pk=image_id, user=request.user)
     except Image.DoesNotExist:
@@ -141,11 +126,7 @@ def image(request, image_id):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
 def model_categories(request):
-    """
-    Lists all model categories
-    """
     categories = ModelCategory.objects.all()
     serializer = ModelCategorySerializer(categories, many=True)
     return response(
@@ -154,22 +135,14 @@ def model_categories(request):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
 def models(request):
-    """
-    Lists all models
-    """
     models = Model.objects.all()
     serializer = ModelSerializer(models, many=True)
     return response(True, "Models retrieved successfully!", serializer.data, 200)
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
 def model_details(request, model_id):
-    """
-    Retrieves a model.
-    """
     try:
         model = Model.objects.get(pk=model_id)
     except Model.DoesNotExist:

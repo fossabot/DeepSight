@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Image, Model, ModelCategory, ProcessedImage, UserSettings
+from .models import User, Image, Model, ModelCategory, ProcessedImage, UserSetting
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -8,17 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email", "first_name", "last_name", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
-    def update(self, instance, validated_data): 
-        password = validated_data.pop("password", None)
-        if password:
-            instance.set_password(password) 
-        return super().update(instance, validated_data)
-
     def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
+        user = User.objects.create_user(**validated_data)
         return user
 
 
@@ -52,7 +43,7 @@ class ProcessedImageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserSettingsSerializer(serializers.ModelSerializer):
+class UserSettingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserSettings
+        model = UserSetting
         fields = "__all__"
