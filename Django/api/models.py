@@ -60,4 +60,4 @@ class ProcessedImage(models.Model):
 
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    theme = models.CharField(max_length=10, choices=[('light', 'Light'), ('dark', 'Dark')], default='light')
+    theme = models.CharField(max_length=10, choices=[('light', 'Light'), ('dark', 'Dark'), ('systemdefault', 'Systemdefault', 'SystemDefault')], default='systemdefault')
