@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Image, ModelCategory, Model, ProcessedImage, UserSettings
+from .models import User, Image, ModelCategory, Model, ProcessedImage, UserSetting
 
 
 @admin.register(User)
@@ -54,7 +54,7 @@ class ProcessedImageAdmin(admin.ModelAdmin):
     readonly_fields = ("image", "model", "creation_date", "processing_time")
 
 
-@admin.register(UserSettings)
-class UserSettingsAdmin(admin.ModelAdmin):
+@admin.register(UserSetting)
+class UserSettingAdmin(admin.ModelAdmin):
     list_display = ("user", "theme")
     readonly_fields = ("user",)
