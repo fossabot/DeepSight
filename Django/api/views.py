@@ -59,20 +59,19 @@ def register(request):
 
 @api_view(["POST"])
 def login(request):
-    try:
-        user = JWTAuthentication().authenticate(request)
-        if user is not None:
-            refresh = RefreshToken.for_user(user[0])
-            return response(
-                True,
-                "User logged in successfully!",
-                {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
-                200,
-            )
-    except AuthenticationFailed:
+    user = JWTAuthentication().authenticate(request)
+    if user is not None:
+        refresh = RefreshToken.for_user(user)
+        return response(
+            True,
+            "User logged in successfully!",
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            200,
+        )
+    else:
         return response(False, "Invalid credentials.", {}, 401)
 
 
