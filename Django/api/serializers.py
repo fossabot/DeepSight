@@ -5,7 +5,15 @@ from .models import User, Image, Model, ModelCategory, ProcessedImage, UserSetti
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "password"]
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "date_joined",
+        ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):

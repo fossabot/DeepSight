@@ -1,14 +1,16 @@
-from django.contrib.auth import authenticate, login
+from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Image, Model, ModelCategory, UserSetting
 from .serializers import (
-    UserSerializer,
     ImageSerializer,
     ModelSerializer,
     ModelCategorySerializer,
+    UserSerializer,
     UserSettingSerializer,
 )
 from .utils import *
@@ -26,15 +28,22 @@ def health(request):
 
 @api_view(["POST"])
 def register(request):
-    if not request.data.get("username") or not request.data.get("first_name") or not request.data.get("last_name"):
+    if (
+        not request.data.get("username")
+        or not request.data.get("first_name")
+        or not request.data.get("last_name")
+    ):
         return response(False, "Missing Fields", {}, 400)
-    if not validate_email(request.data.get("email")) or not validate_password(request.data.get("password")):
+    if not validate_email(request.data.get("email")) or not validate_password(
+        request.data.get("password")
+    ):
         return response(False, "Invalid Request", {}, 400)
-    
+
+    request.data["date_joined"] = timezone.now()
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        UserSetting.objects.create(user=user) 
+        UserSetting.objects.create(user=user)
         refresh = RefreshToken.for_user(user)
         return response(
             True,
@@ -50,22 +59,21 @@ def register(request):
 
 @api_view(["POST"])
 def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        refresh = RefreshToken.for_user(user)
-        return response(
-            True,
-            "User logged in successfully!",
-            {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            },
-            200,
-        )
-    return response(False, "Invalid credentials.", {}, 401)
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is not None:
+            refresh = RefreshToken.for_user(user[0])
+            return response(
+                True,
+                "User logged in successfully!",
+                {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                200,
+            )
+    except AuthenticationFailed:
+        return response(False, "Invalid credentials.", {}, 401)
 
 
 @api_view(["GET", "PUT"])
@@ -161,11 +169,17 @@ def user_settings(request):
 
     if request.method == "GET":
         serializer = UserSettingSerializer(settings)
-        return response(True, "User settings retrieved successfully!", serializer.data, 200)
+        return response(
+            True, "User settings retrieved successfully!", serializer.data, 200
+        )
 
     elif request.method == "PUT":
         serializer = UserSettingSerializer(settings, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return response(True, "User settings updated successfully!", serializer.data, 200)
-        return response(False, "Failed to update user settings.", serializer.errors, 400)
+            return response(
+                True, "User settings updated successfully!", serializer.data, 200
+            )
+        return response(
+            False, "Failed to update user settings.", serializer.errors, 400
+        )
