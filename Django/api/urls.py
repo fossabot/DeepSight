@@ -27,5 +27,5 @@ urlpatterns = [
     # path("processed_image/<int:processed_image_id>", views.processed_image, name="processed_image"),
 
     # User Settings
-    # path("user/settings", views.user_settings, name="user_settings"),
+    path("user/settings", views.user_settings, name="user_settings"),
 ]

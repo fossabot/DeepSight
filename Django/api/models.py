@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    groups = models.ManyToManyField("auth.Group", related_name="deepsight_users")
+    groups = models.ManyToManyField("auth.Group", related_name="api_users")
     user_permissions = models.ManyToManyField(
-        "auth.Permission", related_name="deepsight_api_users"
+        "auth.Permission", related_name="api_users"
     )
 
     def __str__(self):

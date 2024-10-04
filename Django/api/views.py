@@ -3,12 +3,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Image, Model, ModelCategory
+from .models import Image, Model, ModelCategory, UserSetting
 from .serializers import (
     UserSerializer,
     ImageSerializer,
     ModelSerializer,
     ModelCategorySerializer,
+    UserSettingSerializer,
 )
 from .utils import *
 
@@ -33,6 +34,7 @@ def register(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        UserSetting.objects.create(user=user) 
         refresh = RefreshToken.for_user(user)
         return response(
             True,
@@ -150,3 +152,20 @@ def model_details(request, model_id):
 
     serializer = ModelSerializer(model)
     return response(True, "Model data retrieved successfully!", serializer.data, 200)
+
+
+@api_view(["GET", "PUT"])
+@permission_classes([IsAuthenticated])
+def user_settings(request):
+    settings = UserSetting.objects.get(user=request.user)
+
+    if request.method == "GET":
+        serializer = UserSettingSerializer(settings)
+        return response(True, "User settings retrieved successfully!", serializer.data, 200)
+
+    elif request.method == "PUT":
+        serializer = UserSettingSerializer(settings, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return response(True, "User settings updated successfully!", serializer.data, 200)
+        return response(False, "Failed to update user settings.", serializer.errors, 400)
