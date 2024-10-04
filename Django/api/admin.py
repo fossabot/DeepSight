@@ -4,7 +4,7 @@ from .models import User, Image, ModelCategory, Model, ProcessedImage, UserSetti
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("username", "email", "first_name", "last_name", "is_staff", "password")
+    list_display = ("username", "email", "first_name", "last_name", "is_staff")
     list_filter = ("is_staff", "is_superuser", "is_active")
     search_fields = ("username", "email")
 
