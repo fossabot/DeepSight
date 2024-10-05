@@ -3,15 +3,11 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Image, Model, ModelCategory, UserSetting
 from .serializers import (
     ImageSerializer,
-    ModelSerializer,
-    ModelCategorySerializer,
     UserSerializer,
     UserSettingSerializer,
 )
