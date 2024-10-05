@@ -29,11 +29,6 @@ def health(request):
 
 @api_view(["POST"])
 def register(request):
-    if not request.data.get("username") or not request.data.get("first_name") or not request.data.get("last_name"):
-        return response(False, "Missing Fields", {}, 400)
-    if not validate_email(request.data.get("email")) or not validate_password(request.data.get("password")):
-        return response(False, "Invalid Request", {}, 400)
-
     request.data["date_joined"] = timezone.now()
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
