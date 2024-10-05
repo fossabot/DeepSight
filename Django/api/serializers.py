@@ -15,23 +15,30 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "date_joined",
         ]
-        extra_kwargs = {"password": {"write_only": True}}  
-
+        extra_kwargs = {"password": {"write_only": True}}
 
     def validate_email(self, value):
         lower_email = value.lower()
         if User.objects.filter(email__iexact=lower_email).exists():
-            raise serializers.ValidationError("A user with that email already exists.")  
+            raise serializers.ValidationError("A user with that email already exists.")
 
-        if re.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", lower_email) is None: 
+        if re.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", lower_email) is None:
             raise serializers.ValidationError("Invalid email format.")
         return lower_email
 
     def validate_password(self, value):
         if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", value) is None:
-            raise serializers.ValidationError(
-                "Password is too weak."
-            )
+            raise serializers.ValidationError("Password is too weak.")
+        return value
+
+    def validate_first_name(self, value):
+        if not value.get("first_name") or value.get("first_name") == "":
+            raise serializers.ValidationError("First name is required.")
+        return value
+
+    def validate_last_name(self, value):
+        if not value.get("last_name") or value.get("last_name") == "":
+            raise serializers.ValidationError("Last name is required.")
         return value
 
     def create(self, validated_data):

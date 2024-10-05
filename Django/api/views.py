@@ -54,6 +54,8 @@ def login(request):
 
     user = authenticate(request, username=request.data["username"], password=request.data["password"])
     if user is not None:
+        user.last_login = timezone.now()
+        user.save()
         refresh = RefreshToken.for_user(user)
         return response(
             True,
