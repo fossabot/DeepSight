@@ -8,12 +8,6 @@ git clone https://github.com/ItsSpirax/DeepSight
 cd DeepSight
 ```
 
-Set up PostgreSQL password:
-
-```console
-nano docker-compose.yml
-```
-
 Configure environment variables:
 
 ```console
