@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.http import JsonResponse
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +15,10 @@ from .serializers import (
     UserSerializer,
     UserSettingSerializer,
 )
-from .utils import *
+
+
+def response(success, message, data, status=200):
+    return JsonResponse({"success": success, "message": message, "data": data}, status=status)
 
 
 @api_view(["GET"])
