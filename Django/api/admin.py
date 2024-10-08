@@ -1,6 +1,10 @@
 from django.contrib import admin
 from .models import User, Image, ModelCategory, Model, ProcessedImage, UserSetting
 
+admin.site.site_header = "DeepSight Image Processing"
+admin.site.site_title = "DeepSight Admin"
+admin.site.index_title = "Welcome to DeepSight"
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):

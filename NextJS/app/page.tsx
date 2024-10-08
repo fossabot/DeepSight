@@ -1,8 +1,12 @@
+import Head from "next/head";
 import { Footer, Navbar } from "../components";
 import { About, Feedback, GetStarted, Hero } from "../sections";
 
 const Page = () => (
   <div className="bg-primary-black overflow-hidden">
+    <Head>
+      <title>DeepSight</title>{" "}
+    </Head>
     <Navbar />
     <Hero />
     <div className="relative">

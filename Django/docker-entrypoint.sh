@@ -1,5 +1,14 @@
 #!/bin/sh
 
+echo "Collecting static files"
+python manage.py collectstatic --noinput --clear
+
+echo "Compressing static files"
+python -m blacknoise.compress static/
+
+echo "Creating database migrations"
+python manage.py makemigrations --noinput
+
 echo "Waiting for postgres..."
 
 while ! nc -z deepsight-db 5432; do
@@ -8,14 +17,7 @@ done
 
 echo "PostgreSQL started"
 
-echo "Collecting static files"
-python manage.py collectstatic --noinput --clear
-
-echo "Compressing static files"
-python -m blacknoise.compress static/
-
 echo "Applying database migrations"
-python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
 echo "Creating superuser: $DJANGO_SUPERUSER_USERNAME"

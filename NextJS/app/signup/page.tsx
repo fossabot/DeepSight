@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 import { Footer, Navbar } from "../../components";
 import "./signup.css";
 
@@ -67,6 +68,9 @@ const Signup = () => {
 
   return (
     <div className="bg-primary-black overflow-hidden">
+      <Head>
+        <title>DeepSight | Sign Up</title>
+      </Head>
       <Navbar />
       <div className="signup-container">
         <form onSubmit={handleSignup} className="signup-form">

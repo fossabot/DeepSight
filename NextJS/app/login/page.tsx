@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 import { Footer, Navbar } from "../../components";
 import "./login.css";
 
@@ -78,6 +79,9 @@ const Login: React.FC = () => {
 
   return (
     <div className="bg-primary-black">
+      <Head>
+        <title>DeepSight | Login</title>
+      </Head>
       <Navbar />
       <div className="login-container">
         <form onSubmit={handleLogin} className="login-form">

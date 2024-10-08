@@ -30,12 +30,12 @@ class UserSerializer(serializers.ModelSerializer):
         if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", value) is None:
             raise serializers.ValidationError("Password is too weak.")
         return value
-    
+
     def validate(self, data):
-        if not data.get('first_name') or not data.get('last_name'):
+        if not data.get("first_name") or not data.get("last_name"):
             raise serializers.ValidationError("Name field is required.")
-        
-        if data.get('first_name') == "" or data.get('last_name') == "":
+
+        if data.get("first_name") == "" or data.get("last_name") == "":
             raise serializers.ValidationError("Name cannot be empty.")
         return data
 
