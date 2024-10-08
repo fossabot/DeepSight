@@ -11,15 +11,15 @@ const Login: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const accessToken = sessionStorage.getItem("accessToken");
-    if (accessToken) {
+    const authToken = sessionStorage.getItem("authToken");
+    if (authToken) {
       const fetchUserData = async () => {
         try {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/user`,
             {
               headers: {
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: `Bearer ${authToken}`,
               },
             },
           );
@@ -27,12 +27,10 @@ const Login: React.FC = () => {
           if (response.ok) {
             router.push("/home");
           } else {
-            sessionStorage.removeItem("accessToken");
-            setError("Invalid access token");
+            sessionStorage.removeItem("authToken");
           }
         } catch (error: any) {
           console.error("Error fetching user data:", error);
-          setError("Error fetching user data");
         }
       };
 
@@ -61,7 +59,7 @@ const Login: React.FC = () => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      sessionStorage.setItem("accessToken", data.data.access);
+      sessionStorage.setItem("authToken", data.data.token);
       router.push("/home");
     } catch (error: any) {
       setError(error.message);

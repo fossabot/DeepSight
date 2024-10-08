@@ -57,8 +57,7 @@ def login(request):
             True,
             "User logged in successfully!",
             {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
+                "token": str(refresh.access_token),
             },
             200,
         )
