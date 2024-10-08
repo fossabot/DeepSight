@@ -34,14 +34,10 @@ def register(request):
     if serializer.is_valid():
         user = serializer.save()
         UserSetting.objects.create(user=user)
-        refresh = RefreshToken.for_user(user)
         return response(
             True,
             "User registered successfully!",
-            {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            },
+            {},
             201,
         )
     return response(False, "Failed to register user.", serializer.errors, 400)

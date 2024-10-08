@@ -125,10 +125,17 @@ STATIC_ROOT = BASE_DIR / "static"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://az-pune\.spirax\.me$",
-    r"^https://deepsight\.spirax\.me$",
-]
+if DEBUG:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^https://az-pune\.spirax\.me$",
+        r"^https://deepsight\.spirax\.me$",
+        r"^http://localhost:3000$",
+    ]
+else:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^https://az-pune\.spirax\.me$",
+        r"^https://deepsight\.spirax\.me$",
+    ]
 
 CORS_ALLOW_METHODS = [
     "POST",
@@ -138,10 +145,17 @@ CORS_ALLOW_METHODS = [
 ]
 
 # CSRF
-CSRF_TRUSTED_ORIGINS = [
-    "https://az-pune.spirax.me",
-    "https://deepsight.spirax.me",
-]
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://az-pune.spirax.me",
+        "https://deepsight.spirax.me",
+        "http://localhost:3000",
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://az-pune.spirax.me",
+        "https://deepsight.spirax.me",
+    ]
 
 # REST Framework
 REST_FRAMEWORK = {
