@@ -20,10 +20,13 @@ echo "PostgreSQL started"
 echo "Applying database migrations"
 python manage.py migrate --noinput
 
+echo "Flushing expired tokens"
+python manage.py flushexpiredtokens
+
 echo "Creating superuser: $DJANGO_SUPERUSER_USERNAME"
 python manage.py createsuperuser --noinput
 
-if [ "$DEBUG" = "1" ]; then
+if [ "$DEBUG" = "True" ]; then
   echo "Running server in DEBUG mode"
   python manage.py runserver 0.0.0.0:8000
 else

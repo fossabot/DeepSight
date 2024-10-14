@@ -1,6 +1,7 @@
 import re
 from rest_framework import serializers
 from .models import User, Image, Model, ModelCategory, ProcessedImage, UserSetting
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,7 +23,13 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email__iexact=lower_email).exists():
             raise serializers.ValidationError("A user with that email already exists.")
 
-        if re.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", lower_email) is None:
+        if (
+            re.match(
+                r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+                lower_email,
+            )
+            is None
+        ):
             raise serializers.ValidationError("Invalid email format.")
         return lower_email
 
@@ -78,3 +85,10 @@ class UserSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSetting
         fields = "__all__"
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        return token

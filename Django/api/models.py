@@ -42,7 +42,7 @@ class Model(models.Model):
         ("other", "Other"),
     ]
     model_type = models.CharField(max_length=20, choices=MODEL_TYPE_CHOICES)
-    binary_data = models.BinaryField()
+    model_dir = models.CharField(max_length=255)
     model_description = models.TextField(blank=True)
     model_version = models.CharField(max_length=50)
     accuracy = models.FloatField(null=True, blank=True)

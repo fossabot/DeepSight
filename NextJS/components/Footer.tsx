@@ -1,39 +1,33 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { socials } from "../constants";
-import styles from "../styles";
-import { footerVariants } from "../utils/motion";
+import { socials } from "@/constants";
+import styles from "@/styles";
+import Link from "next/link";
 
 const Footer: React.FC = () => (
-  <motion.footer
-    variants={footerVariants}
-    initial="hidden"
-    whileInView="show"
-    className={`${styles.xPaddings} py-8 relative`}
-  >
+  <section className="pb-20 bg-gray-900 px-4 sm:px-8">
     <div className="footer-gradient" />
     <div className={`${styles.innerWidth} mx-auto flex flex-col gap-8`}>
       <div className="flex items-center justify-between flex-wrap gap-5">
         <h4 className="font-bold md:text-[64px] text-[44px] text-white">
           One Pixel at a Time!
         </h4>
-        <button
-          type="button"
-          className="flex items-center h-fit py-4 px-6 bg-[#25618B] rounded-[32px] gap-[12px]"
-        >
-          <Image
-            src="/headset.svg"
-            alt="headset"
-            width={24}
-            height={24}
-            className="object-contain"
-          />
-          <span className="font-normal text-[16px] text-white">
-            Enter DeepSight
-          </span>
-        </button>
+        <Link href="/signup">
+          <button
+            type="button"
+            className="flex items-center h-fit py-4 px-6 bg-[#25618B] rounded-[32px] gap-[12px]"
+          >
+            <Image
+              src="/images/headset.svg"
+              alt="headset"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+            <span className="font-normal text-[16px] text-white">
+              Enter DeepSight
+            </span>
+          </button>
+        </Link>
       </div>
 
       <div className="flex flex-col">
@@ -61,7 +55,7 @@ const Footer: React.FC = () => (
         </div>
       </div>
     </div>
-  </motion.footer>
+  </section>
 );
 
 export default Footer;

@@ -13,9 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ["az-pune.spirax.me", "deepsight.spirax.me"]
 
 
 # Application definition
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "api",
 ]
 
@@ -124,18 +126,10 @@ STATIC_ROOT = BASE_DIR / "static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS
-if DEBUG:
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^https://az-pune\.spirax\.me$",
-        r"^https://deepsight\.spirax\.me$",
-        r"^http://localhost:3000$",
-    ]
-else:
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^https://az-pune\.spirax\.me$",
-        r"^https://deepsight\.spirax\.me$",
-    ]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://(az-pune|deepsight)\.spirax\.me$",
+]
 
 CORS_ALLOW_METHODS = [
     "POST",
@@ -144,18 +138,18 @@ CORS_ALLOW_METHODS = [
     "DELETE",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 # CSRF
-if DEBUG:
-    CSRF_TRUSTED_ORIGINS = [
-        "https://az-pune.spirax.me",
-        "https://deepsight.spirax.me",
-        "http://localhost:3000",
-    ]
-else:
-    CSRF_TRUSTED_ORIGINS = [
-        "https://az-pune.spirax.me",
-        "https://deepsight.spirax.me",
-    ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://az-pune.spirax.me",
+    "https://deepsight.spirax.me",
+]
+
+CSRF_COOKIE_DOMAIN = ".spirax.me"
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
 
 # REST Framework
 REST_FRAMEWORK = {
@@ -169,7 +163,11 @@ REST_FRAMEWORK = {
 
 # Simple JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
 }
 
 AUTH_USER_MODEL = "api.User"

@@ -1,4 +1,4 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.12-alpine AS builder
 WORKDIR /app
 RUN apk add --update --virtual .build-deps \
     build-base \
@@ -8,10 +8,10 @@ RUN apk add --update --virtual .build-deps \
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
-FROM python:3.11-alpine AS production
+FROM python:3.12-alpine AS production
 WORKDIR /app
 RUN apk add libpq
-COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY . /app
 COPY docker-entrypoint.sh /docker-entrypoint.sh

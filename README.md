@@ -3,6 +3,7 @@
 This project is a front-end application that allows users to upload images and run them through a pre-trained deep learning model to detect objects in the image. The application is built using Next.js, a React framework, and Django, a Python web framework.
 
 ## Instructions
+
 ```console
 git clone https://github.com/ItsSpirax/DeepSight
 cd DeepSight

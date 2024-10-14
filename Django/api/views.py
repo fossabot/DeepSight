@@ -1,12 +1,18 @@
+from datetime import datetime, timedelta
+from django.conf import settings
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.http import JsonResponse
-from django.contrib.auth import authenticate
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView, TokenVerifyView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .process import process_image
 
 from .models import Image, Model, ModelCategory, UserSetting
 from .serializers import (
+    LoginSerializer,
     ImageSerializer,
     UserSerializer,
     UserSettingSerializer,
@@ -23,11 +29,34 @@ def home(request):
 
 
 @api_view(["GET"])
+@ensure_csrf_cookie
 def health(request):
     return response(True, "API is healthy!", {}, 200)
 
 
+class login(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
+    @method_decorator(csrf_protect)
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        refresh_token = response.data.get("refresh")
+        response.data = {"access": response.data.get("access")}
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+            path="/api/v1/auth",
+            domain=".spirax.me",
+            httponly=True,
+            samesite="Lax",
+            secure=True,
+        )
+        return response
+
+
 @api_view(["POST"])
+@csrf_protect
 def register(request):
     request.data["date_joined"] = timezone.now()
     serializer = UserSerializer(data=request.data)
@@ -37,36 +66,72 @@ def register(request):
         return response(
             True,
             "User registered successfully!",
-            {},
+            {"username": user.username, "email": user.email},
             201,
         )
     return response(False, "Failed to register user.", serializer.errors, 400)
 
 
-@api_view(["POST"])
-def login(request):
-    if not request.data.get("username") or not request.data.get("password"):
-        return response(False, "Missing Fields", {}, 400)
+class token_refresh(TokenRefreshView):
+    @method_decorator(csrf_protect)
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token is None:
+            return JsonResponse({"success": False, "message": "Refresh token is missing."}, status=400)
 
-    user = authenticate(request, username=request.data["username"], password=request.data["password"])
-    if user is not None:
-        user.last_login = timezone.now()
-        user.save()
-        refresh = RefreshToken.for_user(user)
-        return response(
-            True,
-            "User logged in successfully!",
-            {
-                "token": str(refresh.access_token),
-            },
-            200,
+        request.data["refresh"] = refresh_token
+        response = super().post(request, *args, **kwargs)
+
+        new_refresh_token = response.data.get("refresh")
+        response.set_cookie(
+            key="refresh_token",
+            value=new_refresh_token,
+            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+            path="/api/v1/auth",
+            domain=".spirax.me",
+            httponly=True,
+            samesite="Lax",
+            secure=True,
         )
-    else:
-        return response(False, "Invalid credentials.", {}, 401)
+
+        response.data = {"access": response.data.get("access")}
+
+        return response
+
+
+class token_verify(TokenVerifyView):
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token is None:
+            return JsonResponse({"success": False, "message": "Refresh token is missing."}, status=400)
+        return super().post(request, *args, **kwargs)
+
+
+class logout(TokenBlacklistView):
+    @method_decorator(csrf_protect)
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token is None:
+            return JsonResponse({"success": False, "message": "Refresh token is missing."}, status=400)
+
+        request.data["refresh"] = refresh_token
+        response = super().post(request, *args, **kwargs)
+
+        response.delete_cookie(
+            key="refresh_token",
+            path="/api/v1/auth",
+            domain=".spirax.me",
+            httponly=True,
+            samesite="Lax",
+            secure=True,
+        )
+        return response
 
 
 @api_view(["GET", "PUT"])
 @permission_classes([IsAuthenticated])
+@csrf_protect
 def user(request):
     user = request.user
 
@@ -103,6 +168,7 @@ def user(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@csrf_protect
 def upload_image(request):
     data = request.data.copy()
     data["user"] = request.user.id
@@ -125,7 +191,7 @@ def upload_image(request):
 
 
 @api_view(["GET", "DELETE"])
-@permission_classes([IsAuthenticated])
+@csrf_protect
 def image(request, image_id):
     try:
         image = Image.objects.get(pk=image_id, user=request.user)
@@ -192,6 +258,7 @@ def model_details(request, model_id):
 
 @api_view(["GET", "PUT"])
 @permission_classes([IsAuthenticated])
+@csrf_protect
 def user_settings(request):
     settings = UserSetting.objects.get(user=request.user)
 
@@ -215,3 +282,26 @@ def user_settings(request):
                 200,
             )
         return response(False, "Failed to update user settings.", serializer.errors, 400)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@csrf_protect
+def process_image(request, image_id, model_id):
+    try:
+        image = Image.objects.get(pk=image_id, user=request.user)
+    except Image.DoesNotExist:
+        return response(False, "Image not found.", {}, 404)
+
+    try:
+        model = Model.objects.get(pk=model_id)
+    except Model.DoesNotExist:
+        return response(False, "Model not found.", {}, 404)
+
+    processed_image = process_image(image, model.model_dir)
+    return response(True, "Image processed successfully!", {}, 200)
+
+
+@api_view(["GET"])
+def processed_image(request, processed_image_id):
+    return response(True, "Processed image retrieved successfully!", {}, 200)

@@ -1,0 +1,41 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.home-info {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+input {
+  margin: 10px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  color: black;
+}
+
+.button_non_transparent {
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #49c1d0;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #28a2b5;
+}
+
+p {
+  margin-top: 10px;
+}
