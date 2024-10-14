@@ -122,7 +122,6 @@ class logout(TokenBlacklistView):
             key="refresh_token",
             path="/api/v1/auth",
             domain=".spirax.me",
-            httponly=True,
             samesite="Lax",
             secure=True,
         )
