@@ -43,6 +43,14 @@ class Model(models.Model):
     ]
     model_type = models.CharField(max_length=20, choices=MODEL_TYPE_CHOICES)
     model_dir = models.CharField(max_length=255)
+    MODEL_FORMAT_CHOICES = [
+        ("tensorflow", "TensorFlow"),
+        ("pytorch", "PyTorch"),
+        ("onnx", "ONNX"),
+        ("tflite", "TensorFlow Lite"),
+        ("other", "Other"),
+    ]
+    model_format = models.CharField(max_length=20, choices=MODEL_FORMAT_CHOICES)
     model_description = models.TextField(blank=True)
     model_version = models.CharField(max_length=50)
     accuracy = models.FloatField(null=True, blank=True)
