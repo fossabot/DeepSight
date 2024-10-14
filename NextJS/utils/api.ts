@@ -1,3 +1,5 @@
+import { i } from "framer-motion/client";
+
 export const getCSRFToken = (): string => {
   const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
   if (cookieMatch && cookieMatch.length > 1) {
@@ -47,64 +49,59 @@ export const isAuthenticated = async (
 ): Promise<() => void> => {
   let intervalId: NodeJS.Timeout | null = null;
 
-  try {
-    const accessToken = sessionStorage.getItem("access") || "NO_ACCESS_TOKEN";
+  const checkAuthentication = async () => {
+    try {
+      const accessToken = sessionStorage.getItem("access");
 
-    if (accessToken) {
-      try {
-        const verifyResponse = await apiFetch(`/auth/token/verify`, {
-          method: "POST",
-          body: JSON.stringify({ token: accessToken }),
-        });
+      if (accessToken) {
+        try {
+          const verifyResponse = await apiFetch(`/auth/token/verify`, {
+            method: "POST",
+            body: JSON.stringify({ token: accessToken }),
+          });
 
-        if (verifyResponse.ok) {
-          onAuthenticated();
+          if (verifyResponse.ok) {
+            onAuthenticated();
+          } else if (verifyResponse.status === 401) {
+            sessionStorage.removeItem("access");
 
-          intervalId = setInterval(() => {
-            isAuthenticated(onAuthenticated, onUnauthenticated);
-          }, 600000);
+            try {
+              const refreshResponse = await apiFetch(`/auth/token/refresh`, {
+                method: "POST",
+              });
 
-          return () => {
-            if (intervalId) {
-              clearInterval(intervalId);
+              if (refreshResponse.ok) {
+                const data = await refreshResponse.json();
+                sessionStorage.setItem("access", data.access);
+                onAuthenticated();
+              } else {
+                console.error("Error refreshing access token:", refreshResponse.status);
+                onUnauthenticated(); 
+              }
+            } catch (refreshError) {
+              console.error("Error refreshing access token:", refreshError);
+              onUnauthenticated(); 
             }
-          };
-        } else if (verifyResponse.status === 401) {
-          sessionStorage.removeItem("access");
-
-          try {
-            const refreshResponse = await apiFetch(`/auth/token/refresh`, {
-              method: "POST",
-            });
-
-            if (refreshResponse.ok) {
-              const data = await refreshResponse.json();
-              sessionStorage.setItem("access", data.access);
-              onAuthenticated();
-
-              intervalId = setInterval(() => {
-                isAuthenticated(onAuthenticated, onUnauthenticated);
-              }, 600000);
-
-              return () => {
-                if (intervalId) {
-                  clearInterval(intervalId);
-                }
-              };
-            }
-          } catch (refreshError) {
-            console.error("Error refreshing access token:", refreshError);
+          } else {
+            console.error("Error verifying access token:", verifyResponse.status);
+            onUnauthenticated(); 
           }
+        } catch (verifyError) {
+          console.error("Error verifying access token:", verifyError);
+          onUnauthenticated(); 
         }
-      } catch (verifyError) {
-        console.error("Error verifying access token:", verifyError);
+      } else {
+        onUnauthenticated();
       }
+    } catch (error) {
+      console.error("Error during authentication process:", error);
+      onUnauthenticated();
     }
-  } catch (error) {
-    console.error("Error during authentication process:", error);
-  }
+  };
 
-  onUnauthenticated();
+  checkAuthentication();
+
+  intervalId = setInterval(checkAuthentication, 600000);
 
   return () => {
     if (intervalId) {
