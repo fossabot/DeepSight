@@ -125,7 +125,6 @@ class logout(TokenBlacklistView):
             path="/api/v1/auth",
             domain=".spirax.me",
             samesite="Lax",
-            secure=True,
         )
         return response
 
