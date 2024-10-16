@@ -283,11 +283,11 @@ def user_settings(request):
             )
         return response(False, "Failed to update user settings.", serializer.errors, 400)
 
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def process_image_view(request, image_id, model_id):
+def process_image(request, image_id, model_id):
     try:
-        # Retrieve the image and the model from the database
         image_instance = Image.objects.get(pk=image_id, user=request.user)
     except Image.DoesNotExist:
         return JsonResponse({"success": False, "message": "Image not found."}, status=404)
@@ -297,19 +297,18 @@ def process_image_view(request, image_id, model_id):
     except Model.DoesNotExist:
         return JsonResponse({"success": False, "message": "Model not found."}, status=404)
 
-    # Pass the model binary data to the process_image function
     processed_image = process_image(image_instance, model_instance.model_file, model_instance.model_format)
 
     return JsonResponse({"success": True, "message": "Image processed successfully!"}, status=200)
 
+
 @api_view(["GET"])
-def processed_image_view(request, processed_image_id):
+def processed_image(request, processed_image_id):
     try:
         processed_image = ProcessedImage.objects.get(id=processed_image_id)
     except ProcessedImage.DoesNotExist:
         return JsonResponse({"success": False, "message": "Processed image not found."}, status=404)
 
-    # Serve the processed image as an HTTP response (JPEG format)
     response = HttpResponse(processed_image.binary_data, content_type="image/jpeg")
     response['Content-Disposition'] = f'attachment; filename="processed_image_{processed_image_id}.jpg"'
 

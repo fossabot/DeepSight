@@ -18,7 +18,6 @@ services:
   deepsight-api:
     container_name: deepsight-api
     image: spirax/deepsight-backend:latest
-    # build: ./Django
     restart: unless-stopped
     ports:
       - 8000:8000/tcp
@@ -31,7 +30,6 @@ services:
   deepsight-frontend:
     container_name: deepsight-frontend
     image: spirax/deepsight-frontend:latest
-    # build: ./NextJS
     restart: unless-stopped
     ports:
       - 3000:3000/tcp

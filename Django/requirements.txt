@@ -4,7 +4,8 @@ Django==5.1.2
 django-cors-headers==4.5.0
 djangorestframework-simplejwt==5.3.1
 gunicorn==23.0.0
-pillow==10.4.0
+numpy==1.26.4
+pillow==11.0.0
 psycopg2-binary==2.9.9
-uvicorn==0.31.1
+uvicorn==0.32.0
 uvicorn-worker==0.2.0

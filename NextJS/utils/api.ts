@@ -27,20 +27,32 @@ export const apiFetch = async <T>(
     }
   }
 
-  const accessToken = sessionStorage.getItem("access") || "NO_ACCESS_TOKEN";
+  const accessToken = sessionStorage.getItem("access");
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-      "X-CSRFToken": csrftoken,
-      ...options.headers,
-    },
-    credentials: "include",
-  });
-
-  return response;
+  if (!accessToken) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+        ...options.headers,
+      },
+      credentials: "include",
+    });
+    return response;
+  } else {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "X-CSRFToken": csrftoken,
+        ...options.headers,
+      },
+      credentials: "include",
+    });
+    return response;
+  }
 };
 
 export const isAuthenticated = async (
@@ -51,46 +63,45 @@ export const isAuthenticated = async (
 
   const checkAuthentication = async () => {
     try {
-      const accessToken = sessionStorage.getItem("access");
+      const accessToken = sessionStorage.getItem("access") || "NO_ACCESS_TOKEN";
 
-      if (accessToken) {
-        try {
-          const verifyResponse = await apiFetch(`/auth/token/verify`, {
-            method: "POST",
-            body: JSON.stringify({ token: accessToken }),
-          });
+      try {
+        const verifyResponse = await apiFetch(`/auth/token/verify`, {
+          method: "POST",
+          body: JSON.stringify({ token: accessToken }),
+        });
 
-          if (verifyResponse.ok) {
-            onAuthenticated();
-          } else if (verifyResponse.status === 401) {
-            sessionStorage.removeItem("access");
+        if (verifyResponse.ok) {
+          onAuthenticated();
+        } else if (verifyResponse.status === 401) {
+          sessionStorage.removeItem("access");
 
-            try {
-              const refreshResponse = await apiFetch(`/auth/token/refresh`, {
-                method: "POST",
-              });
+          try {
+            const refreshResponse = await apiFetch(`/auth/token/refresh`, {
+              method: "POST",
+            });
 
-              if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
-                sessionStorage.setItem("access", data.access);
-                onAuthenticated();
-              } else {
-                console.error("Error refreshing access token:", refreshResponse.status);
-                onUnauthenticated(); 
-              }
-            } catch (refreshError) {
-              console.error("Error refreshing access token:", refreshError);
-              onUnauthenticated(); 
+            if (refreshResponse.ok) {
+              const data = await refreshResponse.json();
+              sessionStorage.setItem("access", data.access);
+              onAuthenticated();
+            } else {
+              console.error(
+                "Error refreshing access token:",
+                refreshResponse.status,
+              );
+              onUnauthenticated();
             }
-          } else {
-            console.error("Error verifying access token:", verifyResponse.status);
-            onUnauthenticated(); 
+          } catch (refreshError) {
+            console.error("Error refreshing access token:", refreshError);
+            onUnauthenticated();
           }
-        } catch (verifyError) {
-          console.error("Error verifying access token:", verifyError);
-          onUnauthenticated(); 
+        } else {
+          console.error("Error verifying access token:", verifyResponse.status);
+          onUnauthenticated();
         }
-      } else {
+      } catch (verifyError) {
+        console.error("Error verifying access token:", verifyError);
         onUnauthenticated();
       }
     } catch (error) {
