@@ -1,106 +1,121 @@
-import { i } from "framer-motion/client";
-
-export const getCSRFToken = (): string => {
-  const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+export const getCSRFToken = async (): Promise<string> => {
+  let cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
   if (cookieMatch && cookieMatch.length > 1) {
     return cookieMatch[1];
   }
-  return "";
-};
 
-export const apiFetch = async <T>(
-  url: string,
-  options: RequestInit = {},
-): Promise<Response> => {
-  let csrftoken = getCSRFToken();
-
-  if (!csrftoken) {
+  try {
     const healthResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/health`,
       {
         credentials: "include",
       },
     );
-    csrftoken = getCSRFToken();
-    if (!csrftoken) {
-      throw new Error("Failed to obtain CSRF token.");
+
+    if (healthResponse.ok) {
+      cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+      if (cookieMatch && cookieMatch.length > 1) {
+        return cookieMatch[1];
+      }
+    } else {
+      console.error("Health check failed:", healthResponse.status);
     }
+  } catch (error) {
+    console.error("Error fetching CSRF token:", error);
   }
 
-  const accessToken = sessionStorage.getItem("access");
+  return "";
+};
 
-  if (!accessToken) {
+export const getAccessToken = async (): Promise<string | null> => {
+  try {
+    const accessToken = sessionStorage.getItem("access");
+
+    if (accessToken) {
+      const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      const exp = payload.exp * 1000;
+      const now = Date.now();
+
+      if (exp > now) {
+        return accessToken;
+      }
+    }
+
+    const refreshResponse = await apiFetch(`/auth/token/refresh`, {
+      method: "POST",
+    });
+
+    if (refreshResponse.ok) {
+      const data = await refreshResponse.json();
+      sessionStorage.setItem("access", data.access);
+      return data.access;
+    } else {
+      console.error("Error refreshing access token:", refreshResponse.status);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting access token:", error);
+    return null;
+  }
+};
+
+export const apiFetch = async <T>(
+  url: string,
+  options: RequestInit = {},
+  auth = true,
+): Promise<Response> => {
+  let csrftoken = await getCSRFToken();
+
+  if (!csrftoken) {
+    console.error("CSRF token not found");
+    return new Response(null, { status: 500 });
+  }
+
+  if (auth) {
+    const accessToken = await getAccessToken();
+
+    if (!accessToken) {
+      return new Response(null, { status: 401 });
+    }
+
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+  }
+
+  options.headers = {
+    ...options.headers,
+    "Content-Type": "application/json",
+    "X-CSRFToken": csrftoken,
+  };
+
+  try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-        ...options.headers,
-      },
       credentials: "include",
     });
+    if (response.status === 401) {
+      console.error("Unauthorized request");
+      return new Response(null, { status: 401 });
+    }
+
     return response;
-  } else {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-        "X-CSRFToken": csrftoken,
-        ...options.headers,
-      },
-      credentials: "include",
-    });
-    return response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return new Response(null, { status: 500 });
   }
 };
 
 export const isAuthenticated = async (
   onAuthenticated: () => void,
   onUnauthenticated: () => void,
-): Promise<() => void> => {
-  let intervalId: NodeJS.Timeout | null = null;
+): Promise<void> => {
+  const accessToken = await getAccessToken();
 
-  const checkAuthentication = async () => {
-    try {
-      const accessToken = sessionStorage.getItem("access");
-
-      if (accessToken) {
-        const payload = JSON.parse(atob(accessToken.split(".")[1])); 
-        const exp = payload.exp * 1000;
-        const now = Date.now();
-
-        if (exp > now) {
-          onAuthenticated();
-          return;
-        }
-      }
-      
-      const refreshResponse = await apiFetch(`/auth/token/refresh`, {
-        method: "POST",
-      });
-
-      if (refreshResponse.ok) {
-        const data = await refreshResponse.json();
-        sessionStorage.setItem("access", data.access);
-        onAuthenticated();
-      } else {
-        console.error("Error refreshing access token:", refreshResponse.status);
-        onUnauthenticated();
-      }
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-      onUnauthenticated();
-    }
-  };
-
-  await checkAuthentication(); 
-
-  intervalId = setInterval(checkAuthentication, 300000);
-
-  return () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-    }
-  };
+  if (accessToken) {
+    onAuthenticated();
+  } else {
+    onUnauthenticated();
+  }
 };

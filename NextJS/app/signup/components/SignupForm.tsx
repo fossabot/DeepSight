@@ -37,7 +37,7 @@ const SignupForm: React.FC = () => {
           first_name,
           last_name,
         }),
-      });
+      }, false);
 
       if (!response.ok) {
         const errorData = await response.json();
