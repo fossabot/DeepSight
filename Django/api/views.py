@@ -101,15 +101,6 @@ class token_refresh(TokenRefreshView):
         return response
 
 
-class token_verify(TokenVerifyView):
-    @method_decorator(ensure_csrf_cookie)
-    def post(self, request, *args, **kwargs):
-        refresh_token = request.COOKIES.get("refresh_token")
-        if refresh_token is None:
-            return JsonResponse({"success": False, "message": "Refresh token is missing."}, status=400)
-        return super().post(request, *args, **kwargs)
-
-
 class logout(TokenBlacklistView):
     @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):

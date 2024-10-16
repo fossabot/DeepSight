@@ -63,56 +63,40 @@ export const isAuthenticated = async (
 
   const checkAuthentication = async () => {
     try {
-      const accessToken = sessionStorage.getItem("access") || "NO_ACCESS_TOKEN";
+      const accessToken = sessionStorage.getItem("access");
 
-      try {
-        const verifyResponse = await apiFetch(`/auth/token/verify`, {
-          method: "POST",
-          body: JSON.stringify({ token: accessToken }),
-        });
+      if (accessToken) {
+        const payload = JSON.parse(atob(accessToken.split(".")[1])); 
+        const exp = payload.exp * 1000;
+        const now = Date.now();
 
-        if (verifyResponse.ok) {
+        if (exp > now) {
           onAuthenticated();
-        } else if (verifyResponse.status === 401) {
-          sessionStorage.removeItem("access");
-
-          try {
-            const refreshResponse = await apiFetch(`/auth/token/refresh`, {
-              method: "POST",
-            });
-
-            if (refreshResponse.ok) {
-              const data = await refreshResponse.json();
-              sessionStorage.setItem("access", data.access);
-              onAuthenticated();
-            } else {
-              console.error(
-                "Error refreshing access token:",
-                refreshResponse.status,
-              );
-              onUnauthenticated();
-            }
-          } catch (refreshError) {
-            console.error("Error refreshing access token:", refreshError);
-            onUnauthenticated();
-          }
-        } else {
-          console.error("Error verifying access token:", verifyResponse.status);
-          onUnauthenticated();
+          return;
         }
-      } catch (verifyError) {
-        console.error("Error verifying access token:", verifyError);
+      }
+      
+      const refreshResponse = await apiFetch(`/auth/token/refresh`, {
+        method: "POST",
+      });
+
+      if (refreshResponse.ok) {
+        const data = await refreshResponse.json();
+        sessionStorage.setItem("access", data.access);
+        onAuthenticated();
+      } else {
+        console.error("Error refreshing access token:", refreshResponse.status);
         onUnauthenticated();
       }
     } catch (error) {
-      console.error("Error during authentication process:", error);
+      console.error("Error checking authentication:", error);
       onUnauthenticated();
     }
   };
 
-  checkAuthentication();
+  await checkAuthentication(); 
 
-  intervalId = setInterval(checkAuthentication, 600000);
+  intervalId = setInterval(checkAuthentication, 300000);
 
   return () => {
     if (intervalId) {

@@ -8,7 +8,6 @@ urlpatterns = [
     # Auth Related
     path("auth/register", views.register, name="register"),
     path("auth/login", views.login.as_view(), name="login"),
-    path("auth/token/verify", views.token_verify.as_view(), name="token_verify"),
     path("auth/token/refresh", views.token_refresh.as_view(), name="token_refresh"),
     path("auth/logout", views.logout.as_view(), name="logout"),
     # User Related
