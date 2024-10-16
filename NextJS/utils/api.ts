@@ -41,9 +41,23 @@ export const getAccessToken = async (): Promise<string | null> => {
       }
     }
 
-    const refreshResponse = await apiFetch(`/auth/token/refresh`, {
-      method: "POST",
-    });
+    const csrfToken = await getCSRFToken(); 
+    if (!csrfToken) {
+      console.error("CSRF token not found");
+      return null;
+    }
+
+    const refreshResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh`,
+      {
+        method: "POST",
+        credentials: "include", 
+        headers: {
+          "Content-Type": "application/json", 
+          "X-CSRFToken": csrfToken,
+        },
+      },
+    );
 
     if (refreshResponse.ok) {
       const data = await refreshResponse.json();
