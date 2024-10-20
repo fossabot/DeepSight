@@ -87,12 +87,32 @@ const Navbar: React.FC<NavbarProps> = ({ redirects }) => {
 
         <div className="flex gap-4 items-center">
           {loggedIn && (
-            <Link
-              href="/home"
-              className="text-gray-300 hover:text-white py-2 px-4 rounded-md transition duration-300"
-            >
-              Home
-            </Link>
+            <>
+              <Link
+                href="/home"
+                className="text-gray-300 hover:text-white py-2 px-4 rounded-md transition duration-300"
+              >
+                Home
+              </Link>
+              <Link
+                href="/image"
+                className="text-gray-300 hover:text-white py-2 px-4 rounded-md transition duration-300"
+              >
+                Upload Image
+              </Link>
+              <Link
+                href="/models"
+                className="text-gray-300 hover:text-white py-2 px-4 rounded-md transition duration-300"
+              >
+                View Models
+              </Link>
+              <Link
+                href="/image/process"
+                className="text-gray-300 hover:text-white py-2 px-4 rounded-md transition duration-300"
+              >
+                Run Models
+              </Link>
+            </>
           )}
 
           {loggedIn ? (

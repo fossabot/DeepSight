@@ -28,16 +28,20 @@ const SignupForm: React.FC = () => {
       validatePassword(password);
       validatePasswordConfirmation(password, confirmPassword);
 
-      const response = await apiFetch(`/auth/register`, {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-          username,
-          first_name,
-          last_name,
-        }),
-      }, false);
+      const response = await apiFetch(
+        `/auth/register`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password,
+            username,
+            first_name,
+            last_name,
+          }),
+        },
+        false,
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
