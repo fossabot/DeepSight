@@ -41,7 +41,7 @@ export const getAccessToken = async (): Promise<string | null> => {
       }
     }
 
-    const csrfToken = await getCSRFToken(); 
+    const csrfToken = await getCSRFToken();
     if (!csrfToken) {
       console.error("CSRF token not found");
       return null;
@@ -51,9 +51,9 @@ export const getAccessToken = async (): Promise<string | null> => {
       `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh`,
       {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
         },
       },

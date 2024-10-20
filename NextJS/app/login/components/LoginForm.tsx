@@ -18,10 +18,14 @@ const LoginForm: React.FC = () => {
     try {
       validatePassword(password);
 
-      const response = await apiFetch(`/auth/login`, {
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await apiFetch(
+        `/auth/login`,
+        {
+          method: "POST",
+          body: JSON.stringify({ username, password }),
+        },
+        false,
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
