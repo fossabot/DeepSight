@@ -37,7 +37,12 @@ const LoginForm: React.FC = () => {
 
       router.push("/home");
     } catch (error: any) {
-      setError(error.message);
+      if (error.message === "Password is too weak.") {
+        setError("Incorrect password");
+      }
+      else {
+        setError(error.message);
+      }
     }
   };
 

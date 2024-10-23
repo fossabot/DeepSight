@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.utils.decorators import method_decorator

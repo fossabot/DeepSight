@@ -9,7 +9,7 @@ export const metadata = {
 export default function Image() {
   return (
     <div className="bg-primary-black">
-      <Navbar redirects={["", "/login"]} />
+      <Navbar redirects={["", ""]} />
       <ImagePage />
       <Footer />
     </div>
