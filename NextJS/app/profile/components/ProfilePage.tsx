@@ -1,40 +1,86 @@
 "use client";
 
-import { apiFetch } from "@/utils/api";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { apiFetch } from "@/utils/api";
 
-const ProfilePage: React.FC = () => {
+const UserProfile: React.FC = () => {
+  const router = useRouter();
+  const initialStoredProfile =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("userProfile") || "{}")
+      : {};
+  const initialStoredTheme =
+    typeof window !== "undefined"
+      ? localStorage.getItem("userTheme") || ""
+      : "";
+
+  const [initialProfileData, setInitialProfileData] = useState({
+    username: initialStoredProfile.username || "",
+    email: initialStoredProfile.email || "",
+    first_name: initialStoredProfile.first_name || "",
+    last_name: initialStoredProfile.last_name || "",
+  });
+
   const [profileData, setProfileData] = useState({
-    username: "",
-    email: "",
-    firstName: "",
-    lastName: "",
+    username: initialStoredProfile.username || "",
+    email: initialStoredProfile.email || "",
+    first_name: initialStoredProfile.first_name || "",
+    last_name: initialStoredProfile.last_name || "",
     password: "",
   });
-  const [theme, setTheme] = useState("");
+
+  const [theme, setTheme] = useState(initialStoredTheme);
+  const [initialTheme, setInitialTheme] = useState(initialStoredTheme);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [notification, setNotification] = useState("");
 
   useEffect(() => {
-    // Fetch user profile data
     const fetchProfileData = async () => {
       try {
-        const profileResponse = await apiFetch("https://az-pune.spirax.me/api/v1/user/profile");
+        const profileResponse = await apiFetch("/user/profile/");
         const profileJson = await profileResponse.json();
-        setProfileData(profileJson);
 
-        const themeResponse = await apiFetch("https://az-pune.spirax.me/api/v1/user/settings");
+        if (profileJson.success && profileJson.data) {
+          const { username, email, first_name, last_name } = profileJson.data;
+          const initialProfile = {
+            username: username || "",
+            email: email || "",
+            first_name: first_name || "",
+            last_name: last_name || "",
+          };
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("userProfile", JSON.stringify(initialProfile));
+          }
+
+          setInitialProfileData(initialProfile);
+          setProfileData({ ...initialProfile, password: "" });
+        }
+
+        const themeResponse = await apiFetch("/user/settings");
         const themeJson = await themeResponse.json();
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("userTheme", themeJson.theme);
+        }
+
+        setInitialTheme(themeJson.theme);
         setTheme(themeJson.theme);
-        
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchProfileData();
-  }, []);
+    if (!initialStoredProfile.username || !initialStoredTheme) {
+      fetchProfileData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [initialStoredProfile.username, initialStoredTheme]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,115 +93,176 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setNotification("");
+
+    const updatedProfileData: { [key: string]: string } = {};
+    const { username, email, first_name, last_name, password } = profileData;
+
+    if (username !== initialProfileData.username)
+      updatedProfileData.username = username;
+    if (email !== initialProfileData.email) updatedProfileData.email = email;
+    if (first_name !== initialProfileData.first_name)
+      updatedProfileData.first_name = first_name;
+    if (last_name !== initialProfileData.last_name)
+      updatedProfileData.last_name = last_name;
+    if (password) updatedProfileData.password = password;
 
     try {
-      // Update profile data
-      await apiFetch("/https://az-pune.spirax.meapi/v1/user/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileData),
-      });
+      if (Object.keys(updatedProfileData).length > 0) {
+        const profileUpdateResponse = await apiFetch("/user/profile/", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedProfileData),
+        });
 
-      // Update theme
-      await apiFetch("https://az-pune.spirax.me/api/v1/user/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme }),
-      });
+        if (!profileUpdateResponse.ok) {
+          throw new Error("Profile update failed.");
+        }
 
-      alert("Profile updated successfully!");
+        if (typeof window !== "undefined") {
+          localStorage.setItem(
+            "userProfile",
+            JSON.stringify({ ...initialProfileData, ...updatedProfileData }),
+          );
+        }
+      }
+
+      if (theme !== initialTheme) {
+        const themeUpdateResponse = await apiFetch("/user/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ theme }),
+        });
+
+        if (!themeUpdateResponse.ok) {
+          throw new Error("Theme update failed.");
+        }
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("userTheme", theme);
+        }
+      }
+
+      router.refresh();
+      setNotification("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
+      setNotification("Failed to update profile. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <p className="text-white">Loading...</p>;
   }
 
   return (
-    <div className="profile-container bg-gray-900 p-6 rounded-lg shadow-md text-white">
-      <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+    <div className="profile-container bg-gray-900 p-12 text-white min-h-screen flex flex-col items-center justify-center relative pt-40 pb-10">
+      <div className="p-12 rounded-lg shadow-lg w-full max-w-xl mb-8">
+        <h2 className="text-3xl font-bold text-white mb-4">User Profile</h2>
 
-      <div className="form-group mb-4">
-        <label className="block text-sm font-bold mb-2">Username</label>
-        <input
-          type="text"
-          name="username"
-          value={profileData.username}
-          onChange={handleInputChange}
-          className="p-2 w-full border rounded"
-        />
-      </div>
+        {notification && (
+          <div className="absolute top-4 right-4 p-2 bg-green-600 text-white rounded shadow">
+            {notification}
+          </div>
+        )}
 
-      <div className="form-group mb-4">
-        <label className="block text-sm font-bold mb-2">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={profileData.email}
-          onChange={handleInputChange}
-          className="p-2 w-full border rounded"
-        />
-      </div>
+        <div className="form-group mb-4">
+          <label className="block text-sm font-bold mb-2 text-gray-300">
+            Username
+          </label>
+          <input
+            type="text"
+            name="username"
+            value={profileData.username}
+            onChange={handleInputChange}
+            className="p-2 w-full border rounded"
+            placeholder="Enter username"
+          />
+        </div>
 
-      <div className="form-group mb-4">
-        <label className="block text-sm font-bold mb-2">First Name</label>
-        <input
-          type="text"
-          name="firstName"
-          value={profileData.firstName}
-          onChange={handleInputChange}
-          className="p-2 w-full border rounded"
-        />
-      </div>
+        <div className="form-group mb-4">
+          <label className="block text-sm font-bold mb-2 text-gray-300">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={profileData.email}
+            onChange={handleInputChange}
+            className="p-2 w-full border rounded"
+            placeholder="Enter email"
+          />
+        </div>
 
-      <div className="form-group mb-4">
-        <label className="block text-sm font-bold mb-2">Last Name</label>
-        <input
-          type="text"
-          name="lastName"
-          value={profileData.lastName}
-          onChange={handleInputChange}
-          className="p-2 w-full border rounded"
-        />
-      </div>
+        <div className="form-group mb-4">
+          <label className="block text-sm font-bold mb-2 text-gray-300">
+            First Name
+          </label>
+          <input
+            type="text"
+            name="first_name"
+            value={profileData.first_name}
+            onChange={handleInputChange}
+            className="p-2 w-full border rounded"
+            placeholder="Enter first name"
+          />
+        </div>
 
-      <div className="form-group mb-4">
-        <label className="block text-sm font-bold mb-2">Password</label>
-        <input
-          type="password"
-          name="password"
-          value={profileData.password}
-          onChange={handleInputChange}
-          className="p-2 w-full border rounded"
-        />
-      </div>
+        <div className="form-group mb-4">
+          <label className="block text-sm font-bold mb-2 text-gray-300">
+            Last Name
+          </label>
+          <input
+            type="text"
+            name="last_name"
+            value={profileData.last_name}
+            onChange={handleInputChange}
+            className="p-2 w-full border rounded"
+            placeholder="Enter last name"
+          />
+        </div>
 
-      <div className="form-group mb-6">
-        <label className="block text-sm font-bold mb-2">Theme</label>
-        <select
-          value={theme}
-          onChange={handleThemeChange}
-          className="p-2 w-full border rounded"
+        <div className="form-group mb-4">
+          <label className="block text-sm font-bold mb-2 text-gray-300">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={profileData.password}
+            onChange={handleInputChange}
+            className="p-2 w-full border rounded"
+            placeholder="Enter new password if you want to change"
+          />
+        </div>
+
+        <div className="form-group mb-6">
+          <label className="block text-sm font-bold mb-2 text-black">
+            Theme
+          </label>
+          <select
+            value={theme}
+            onChange={handleThemeChange}
+            className="p-2 w-full border rounded text-black"
+          >
+            <option value="systemdefault">System Default</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+
+        <button
+          onClick={handleSave}
+          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+          disabled={isSaving}
         >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="blue">Blue</option>
-        </select>
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
       </div>
-
-      <button
-        onClick={handleSave}
-        className="button_non_transparent"
-        disabled={isSaving}
-      >
-        {isSaving ? "Saving..." : "Save Changes"}
-      </button>
     </div>
   );
 };
 
-export default ProfilePage;
+export default UserProfile;

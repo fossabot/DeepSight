@@ -29,7 +29,7 @@ export const getCSRFToken = async (): Promise<string> => {
 
 export const getAccessToken = async (): Promise<string | null> => {
   try {
-    const accessToken = sessionStorage.getItem("access");
+    const accessToken = localStorage.getItem("access");
 
     if (accessToken) {
       const payload = JSON.parse(atob(accessToken.split(".")[1]));
@@ -48,7 +48,7 @@ export const getAccessToken = async (): Promise<string | null> => {
     }
 
     const refreshResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh`,
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`,
       {
         method: "POST",
         credentials: "include",
@@ -61,7 +61,7 @@ export const getAccessToken = async (): Promise<string | null> => {
 
     if (refreshResponse.ok) {
       const data = await refreshResponse.json();
-      sessionStorage.setItem("access", data.access);
+      localStorage.setItem("access", data.access);
       return data.access;
     } else {
       console.error("Error refreshing access token:", refreshResponse.status);
@@ -77,12 +77,21 @@ export const apiFetch = async <T>(
   url: string,
   options: RequestInit = {},
   auth = true,
+  json = true,
+  cors = true,
 ): Promise<Response> => {
-  let csrftoken = await getCSRFToken();
+  if (cors) {
+    let csrftoken = await getCSRFToken();
 
-  if (!csrftoken) {
-    console.error("CSRF token not found");
-    return new Response(null, { status: 500 });
+    if (!csrftoken) {
+      console.error("CSRF token not found");
+      return new Response(null, { status: 500 });
+    }
+
+    options.headers = {
+      ...options.headers,
+      "X-CSRFToken": csrftoken,
+    };
   }
 
   if (auth) {
@@ -98,11 +107,12 @@ export const apiFetch = async <T>(
     };
   }
 
-  options.headers = {
-    ...options.headers,
-    "Content-Type": "application/json",
-    "X-CSRFToken": csrftoken,
-  };
+  if (json && options.body) {
+    options.headers = {
+      ...options.headers,
+      "Content-Type": "application/json",
+    };
+  }
 
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {

@@ -17,9 +17,8 @@ if [ ! -f ".setup_complete" ]; then
   echo "Starting Deepsight application setup..."
   echo "----------------------------------------"
 
-  echo "Installing ML Libraries: TensorFlow, ONNX Runtime, and PyTorch..."
-  pip install tensorflow-cpu==2.17.0 onnxruntime==1.19.2 --no-cache-dir --quiet || exit 1
-  pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu --no-cache-dir --quiet || exit 1
+  echo "Installing ML Libraries: TensorFlow, ONNX Runtime, and Ultralytics..."
+  pip install tensorflow-cpu==2.17.0 onnxruntime==1.19.2 ultralytics==8.3.21 --no-cache-dir --quiet || exit 1
 
   echo "Collecting static files..."
   python manage.py collectstatic --noinput --clear || exit 1
@@ -43,6 +42,9 @@ if [ ! -f ".setup_complete" ]; then
 
   echo "Creating superuser: $DJANGO_SUPERUSER_USERNAME..."
   python manage.py createsuperuser --noinput
+
+  echo "Setting up Models..."
+  python setup.py
 
   touch .setup_complete
 else

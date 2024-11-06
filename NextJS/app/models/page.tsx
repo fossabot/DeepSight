@@ -9,7 +9,7 @@ export const metadata = {
 export default function Home() {
   return (
     <div className="bg-primary-black">
-      <Navbar redirects={["", "/login"]} />
+      <Navbar redirects={["", ""]} />
       <ModelsPage />
       <Footer />
     </div>

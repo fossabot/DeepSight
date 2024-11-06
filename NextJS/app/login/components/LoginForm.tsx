@@ -19,7 +19,7 @@ const LoginForm: React.FC = () => {
       validatePassword(password);
 
       const response = await apiFetch(
-        `/auth/login`,
+        `/auth/login/`,
         {
           method: "POST",
           body: JSON.stringify({ username, password }),
@@ -33,14 +33,13 @@ const LoginForm: React.FC = () => {
       }
 
       const data = await response.json();
-      sessionStorage.setItem("access", data.access);
+      localStorage.setItem("access", data.access);
 
       router.push("/home");
     } catch (error: any) {
       if (error.message === "Password is too weak.") {
         setError("Incorrect password");
-      }
-      else {
+      } else {
         setError(error.message);
       }
     }

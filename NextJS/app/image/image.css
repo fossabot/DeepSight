@@ -12,19 +12,21 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 800px; /* Wider box */
+  max-width: 800px;
   margin: 10px 0;
 }
 
 .dropzone {
   width: 100%;
-  height: 40vh; /* Adjust to make the box taller */
+  height: 40vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: #171d21;
   border-radius: 10px;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
 }
 
 .dropzone p {
@@ -33,7 +35,7 @@
 }
 
 .dropzone:hover {
-  background-color: #e6f7ff;
+  background-color: #002d42;
   border-color: #49c1d0;
 }
 

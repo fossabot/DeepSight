@@ -1,69 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import Link from "next/link";
 
-const Home: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [email, setEmail] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkSessionData = () => {
-      const email = sessionStorage.getItem("email");
-      const username = sessionStorage.getItem("username");
-      const firstName = sessionStorage.getItem("firstName");
-      const lastName = sessionStorage.getItem("lastName");
-
-      if (email && username && firstName && lastName) {
-        setEmail(email);
-        setUsername(username);
-        setFirstName(firstName);
-        setLastName(lastName);
-        setIsLoading(false);
-      }
-    };
-
-    checkSessionData();
-    const intervalId = setInterval(checkSessionData, 500);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
+const HomePage: React.FC = () => {
   return (
     <div className="home-container bg-gray-900">
-      <div className="home-info bg-white p-6 rounded-lg shadow-md text-black">
-        <h2 className="text-2xl font-bold mb-4">User Information</h2>
-        {isLoading ? (
-          <p>Loading user data...</p>
-        ) : (
-          <ul>
-            {email && (
-              <li>
-                <strong>Email:</strong> {email}
-              </li>
-            )}
-            {username && (
-              <li>
-                <strong>Username:</strong> {username}
-              </li>
-            )}
-            {firstName && (
-              <li>
-                <strong>First Name:</strong> {firstName}
-              </li>
-            )}
-            {lastName && (
-              <li>
-                <strong>Last Name:</strong> {lastName}
-              </li>
-            )}
-          </ul>
-        )}
-      </div>
+      <h1 className="home-title">Welcome to DeepSight</h1>
+      <p className="home-description">
+        Explore, upload, and process images with advanced models.
+      </p>
+      <Link href="/image" className="home-button">
+        Get Started
+      </Link>
     </div>
   );
 };
 
-export default Home;
+export default HomePage;

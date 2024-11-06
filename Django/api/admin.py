@@ -11,6 +11,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
     list_filter = ("is_staff", "is_superuser", "is_active")
     search_fields = ("username", "email")
+    ordering = ("username",)
 
 
 @admin.register(Image)
@@ -23,7 +24,7 @@ class ImageAdmin(admin.ModelAdmin):
         "image_format",
         "image_size",
     )
-    list_filter = ("is_processed", "image_format")
+    list_filter = ("is_processed", "image_format", "upload_date")
     search_fields = ("image_name", "user__username")
     actions = ["mark_as_processed"]
 
@@ -35,14 +36,17 @@ class ImageAdmin(admin.ModelAdmin):
 
 @admin.register(ModelCategory)
 class ModelCategoryAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("category_name",)
+    search_fields = ("category_name",)
+    ordering = ("category_name",)
 
 
 @admin.register(Model)
 class ModelAdmin(admin.ModelAdmin):
-    list_display = ("model_name", "model_type", "model_version", "accuracy", "category")
-    list_filter = ("model_type", "category")
+    list_display = ("model_name", "model_format", "model_version", "category")
+    list_filter = ("model_format", "category")
     search_fields = ("model_name", "model_description")
+    ordering = ("model_name",)
 
 
 @admin.register(ProcessedImage)
@@ -53,12 +57,15 @@ class ProcessedImageAdmin(admin.ModelAdmin):
         "creation_date",
         "processing_time",
         "output_format",
+        "processed_image_size",
     )
-    list_filter = ("model", "output_format")
-    readonly_fields = ("image", "model", "creation_date", "processing_time")
+    list_filter = ("model", "output_format", "creation_date")
+    readonly_fields = ("image", "model", "creation_date", "processing_time", "output_format", "processed_image_size")
+    search_fields = ("image__image_name", "model__model_name")
 
 
 @admin.register(UserSetting)
 class UserSettingAdmin(admin.ModelAdmin):
     list_display = ("user", "theme")
     readonly_fields = ("user",)
+    list_filter = ("theme",)

@@ -6,8 +6,8 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .process import process_image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from .process import process
 from django.http import HttpResponse
 from .models import ProcessedImage
 
@@ -156,24 +156,43 @@ def user(request):
         return response(False, "Failed to update user data.", serializer.errors, 400)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def image(request):
+    images = Image.objects.filter(user=request.user)
+    data = [{"id": image.id} for image in images]
+    return response(True, "Image IDs retrieved successfully!", data, 200)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @csrf_protect
 def upload_image(request):
-    data = request.data.copy()
-    data["user"] = request.user.id
+    if "image" not in request.FILES:
+        return response(False, "No image provided.", {}, 400)
+
+    image_file: InMemoryUploadedFile = request.FILES["image"]
+
+    data = {
+        "image_name": image_file.name,
+        "image_format": image_file.content_type.split("/")[1],
+        "image_size": image_file.size,
+    }
+
     serializer = ImageSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
+        image_instance = serializer.save(user=request.user)
+        image_instance.binary_data = image_file.read()
+        image_instance.save()
         return response(
             True,
             "Image uploaded successfully!",
             {
-                "id": serializer.data["id"],
-                "image_name": serializer.data["image_name"],
-                "upload_date": serializer.data["upload_date"],
-                "image_format": serializer.data["image_format"],
-                "image_size": serializer.data["image_size"],
+                "id": image_instance.id,
+                "image_name": image_instance.image_name,
+                "upload_date": image_instance.upload_date,
+                "image_format": image_instance.image_format,
+                "image_size": image_instance.image_size,
             },
             201,
         )
@@ -181,26 +200,18 @@ def upload_image(request):
 
 
 @api_view(["GET", "DELETE"])
+@permission_classes([IsAuthenticated])
 @csrf_protect
-def image(request, image_id):
+def image_id(request, image_id):
     try:
         image = Image.objects.get(pk=image_id, user=request.user)
     except Image.DoesNotExist:
         return response(False, "Image not found.", {}, 404)
 
     if request.method == "GET":
-        return response(
-            True,
-            "Image data retrieved successfully!",
-            {
-                "id": image.id,
-                "image_name": image.image_name,
-                "upload_date": image.upload_date,
-                "image_format": image.image_format,
-                "image_size": image.image_size,
-            },
-            200,
-        )
+        response = HttpResponse(content=image.binary_data, content_type=image.image_format)
+        response["Content-Disposition"] = f'attachment; filename="{image.image_name}"'
+        return response
 
     elif request.method == "DELETE":
         image.delete()
@@ -236,12 +247,12 @@ def model_details(request, model_id):
 
     data = {
         "id": model.id,
+        "url": model.url,
         "model_name": model.model_name,
-        "model_type": model.model_type,
+        "model_format": model.model_format,
         "model_description": model.model_description,
         "model_version": model.model_version,
-        "accuracy": model.accuracy,
-        "category": model.category.category_name,
+        "category": model.category.category_name.capitalize(),
     }
     return response(True, "Model data retrieved successfully!", data, 200)
 
@@ -275,6 +286,7 @@ def user_settings(request):
 
 
 @api_view(["POST"])
+@csrf_protect
 @permission_classes([IsAuthenticated])
 def process_image(request, image_id, model_id):
     try:
@@ -287,21 +299,26 @@ def process_image(request, image_id, model_id):
     except Model.DoesNotExist:
         return JsonResponse({"success": False, "message": "Model not found."}, status=404)
 
-    processed_image = process_image(image_instance, model_instance.model_file, model_instance.model_format)
+    processed_image = process(image_instance, model_instance)
 
-    return JsonResponse({"success": True, "message": "Image processed successfully!"}, status=200)
+    if processed_image is None:
+        return JsonResponse({"success": False, "message": "Failed to process image."}, status=500)
+
+    response = HttpResponse(content=processed_image.binary_data, content_type="image/jpeg")
+    response["Content-Disposition"] = f'attachment; filename="processed_image_{processed_image.id}.jpg"'
+
+    return response
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def processed_image(request, processed_image_id):
     try:
         processed_image = ProcessedImage.objects.get(id=processed_image_id)
     except ProcessedImage.DoesNotExist:
         return JsonResponse({"success": False, "message": "Processed image not found."}, status=404)
 
-    response = HttpResponse(processed_image.binary_data, content_type="image/jpeg")
-    response['Content-Disposition'] = f'attachment; filename="processed_image_{processed_image_id}.jpg"'
+    response = HttpResponse(content=processed_image.binary_data, content_type="image/jpeg")
+    response["Content-Disposition"] = f'attachment; filename="processed_image_{processed_image_id}.jpg"'
 
     return response
-
-

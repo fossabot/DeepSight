@@ -29,7 +29,7 @@ const SignupForm: React.FC = () => {
       validatePasswordConfirmation(password, confirmPassword);
 
       const response = await apiFetch(
-        `/auth/register`,
+        `/auth/register/`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -49,10 +49,10 @@ const SignupForm: React.FC = () => {
       }
 
       try {
-        await apiFetch(`/auth/logout`, {
+        await apiFetch(`/auth/logout/`, {
           method: "POST",
         });
-        sessionStorage.clear();
+        localStorage.clear();
       } catch (error) {
         console.error("Error logging out:", error);
       }

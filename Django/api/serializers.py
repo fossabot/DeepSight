@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email__iexact=lower_email).exists():
             raise serializers.ValidationError("A user with that email already exists.")
 
+        # Validate email format using regex
         if (
             re.match(
                 r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
@@ -34,27 +35,33 @@ class UserSerializer(serializers.ModelSerializer):
         return lower_email
 
     def validate_password(self, value):
+        # Enforce strong password requirements using regex
         if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", value) is None:
             raise serializers.ValidationError("Password is too weak.")
         return value
 
-    def validate(self, data):
-        if not data.get("first_name") or not data.get("last_name"):
-            raise serializers.ValidationError("Name field is required.")
-
-        if data.get("first_name") == "" or data.get("last_name") == "":
-            raise serializers.ValidationError("Name cannot be empty.")
-        return data
-
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        password = validated_data.pop("password", None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
         return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = "__all__"
+        exclude = ["binary_data"]
         read_only_fields = ["user", "upload_date", "is_processed"]
 
 

@@ -15,8 +15,8 @@ services:
       timeout: 5s
       retries: 10
 
-  deepsight-api:
-    container_name: deepsight-api
+  deepsight-backend:
+    container_name: deepsight-backend
     image: spirax/deepsight-backend:latest
     restart: unless-stopped
     ports:
@@ -34,7 +34,7 @@ services:
     ports:
       - 3000:3000/tcp
     depends_on:
-      - deepsight-api
+      - deepsight-backend
 
 volumes:
   db_data:

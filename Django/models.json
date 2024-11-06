@@ -1,0 +1,24 @@
+[
+    {
+        "model_name": "GoogleNet Age Classification Model",
+        "url": "https://github.com/onnx/models/raw/refs/heads/main/validated/vision/body_analysis/age_gender/models/age_googlenet.onnx",
+        "model_dir": "./api/models/age_googlenet.onnx",
+        "model_format": "onnx",
+        "model_description": "This model estimates age from facial images using the GoogleNet architecture. It can be used for applications like targeted advertising and access control.  Achieves an accuracy of 85% on the Adience dataset. May exhibit bias in age prediction across different ethnicities.",
+        "model_version": "1.6.0",
+        "model_category": "classification",
+    },
+    {
+        "model_name": "GoogleNet Gender Classification Model",
+        "url": "https://github.com/onnx/models/raw/refs/heads/main/validated/vision/body_analysis/age_gender/models/gender_googlenet.onnx",
+        "model_dir": "./api/models/gender_googlenet.onnx",
+        "model_format": "onnx",
+        "model_description": "This model predicts gender from facial images using the GoogleNet architecture.  It can be applied to tasks such as customer segmentation and personalized recommendations. Achieves an accuracy of 92% on the LFW dataset.",
+        "model_version": "1.6.0",
+        "model_category": "classification",
+    },
+    {"model_name": "MediaPipe Face Detection (Short Range)", "url": "https://storage.googleapis.com/mediapipe-assets/face_detection_short_range.tflite", "model_dir": "./api/models/face_detection_short_range.tflite", "model_format": "tflite", "model_description": "This lightweight model is designed for short-range face detection on mobile devices, ideal for real-time applications that require fast and efficient performance.", "model_version": "1.0.0", "model_category": "detection"},
+    {"model_name": "MediaPipe Full Body Pose Landmark", "url": "https://storage.googleapis.com/mediapipe-assets/pose_landmark_full.tflite", "model_dir": "./api/models/pose_landmark_full.tflite", "model_format": "tflite", "model_description": "Accurately detects 33 pose landmarks across the entire body, enabling applications in fitness tracking, motion analysis, and augmented reality experiences.", "model_version": "1.0.0", "model_category": "landmark"},
+    {"model_name": "MediaPipe Hand Landmark", "url": "https://storage.googleapis.com/mediapipe-assets/hand_landmark_full.tflite", "model_dir": "./api/models/hand_landmark_full.tflite", "model_format": "tflite", "model_description": "Provides high-fidelity tracking of 21 hand landmarks per hand, facilitating gesture recognition, sign language interpretation, and the development of interactive controls.", "model_version": "1.0.0", "model_category": "landmark"},
+    {"model_name": "YOLOv11l Object Detection", "url": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l.pt", "model_dir": "./api/models/yolo11l.pt", "model_format": "yolo", "model_description": "A high-performance object detection model from Ultralytics, YOLOv11l offers improved speed and accuracy compared to previous versions. Suitable for tasks like image analysis, video surveillance, and autonomous driving.", "model_version": "11.0.0", "model_category": "detection"},
+]
