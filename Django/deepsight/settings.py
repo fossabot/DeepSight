@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 
-ALLOWED_HOSTS = ["az-pune.spirax.me", "deepsight.spirax.me"]
+ALLOWED_HOSTS = ["localhost"]
 
 
 # Application definition
@@ -128,7 +128,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://(az-pune|deepsight)\.spirax\.me$",
+    r"^http://localhost:\d+$",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -143,11 +143,10 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://az-pune.spirax.me",
-    "https://deepsight.spirax.me",
+    "http://localhost:3000",
 ]
 
-CSRF_COOKIE_DOMAIN = ".spirax.me"
+CSRF_COOKIE_DOMAIN = "localhost"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
 

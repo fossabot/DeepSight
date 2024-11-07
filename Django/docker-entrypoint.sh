@@ -18,6 +18,7 @@ if [ ! -f ".setup_complete" ]; then
   echo "----------------------------------------"
 
   echo "Installing ML Libraries: Mediapipe, ONNX Runtime, and Ultralytics..."
+  echo "This may take up to 5-6 minutes for the first time setup."
   pip install mediapipe==0.10.18 onnxruntime==1.19.2 ultralytics==8.3.21 --no-cache-dir --quiet || exit 1
 
   echo "Collecting static files..."

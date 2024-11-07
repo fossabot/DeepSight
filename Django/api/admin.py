@@ -51,13 +51,7 @@ class ModelAdmin(admin.ModelAdmin):
 
 @admin.register(ProcessedImage)
 class ProcessedImageAdmin(admin.ModelAdmin):
-    list_display = (
-        "image",
-        "model",
-        "creation_date",
-        "processing_time",
-        "output_format"
-    )
+    list_display = ("image", "model", "creation_date", "processing_time", "output_format")
     list_filter = ("model", "output_format", "creation_date")
     readonly_fields = ("image", "model", "creation_date", "processing_time", "output_format")
     search_fields = ("image__image_name", "model__model_name")

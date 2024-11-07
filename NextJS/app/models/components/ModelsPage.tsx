@@ -100,7 +100,7 @@ const ModelsPage = () => {
             >
               <div className="model-thumbnail-container flex justify-center mb-4">
                 <img
-                  src={`https://az-pune.spirax.me/static/${model.model_format}.png`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}static/${model.model_format}.png`}
                   alt={`${model.model_format} format`}
                   className="model-thumbnail w-24 h-24 rounded"
                 />

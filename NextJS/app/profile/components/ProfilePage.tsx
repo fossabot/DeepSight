@@ -116,7 +116,8 @@ const UserProfile: React.FC = () => {
         });
 
         if (!profileUpdateResponse.ok) {
-          throw new Error("Profile update failed.");
+          const errorMsg = await profileUpdateResponse.json();
+          throw new Error(`Profile update failed. ${errorMsg.message}`);
         }
 
         if (typeof window !== "undefined") {

@@ -6,7 +6,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {
-    NEXT_PUBLIC_API_URL: "https://az-pune.spirax.me/api/v1",
+    NEXT_PUBLIC_API_URL: "http://localhost:8000/",
   },
 };
 

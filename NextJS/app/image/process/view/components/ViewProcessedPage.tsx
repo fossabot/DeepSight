@@ -88,11 +88,18 @@ const ViewProcessedPage: React.FC = () => {
                 >
                   X
                 </button>
-                <img
-                  src={image.blobUrl}
-                  alt={`Processed Image ${index}`}
-                  className="w-full h-auto rounded shadow-md"
-                />
+                <a
+                  href={image.blobUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <img
+                    src={image.blobUrl}
+                    alt={`Processed Image ${index}`}
+                    className="w-full h-auto rounded shadow-md"
+                  />
+                </a>
               </div>
             ))
           ) : (

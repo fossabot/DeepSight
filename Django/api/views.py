@@ -48,7 +48,7 @@ class login(TokenObtainPairView):
             value=refresh_token,
             max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
             path="/api/v1/auth",
-            domain=".spirax.me",
+            domain=".localhost",
             httponly=True,
             samesite="Lax",
             secure=True,
@@ -89,7 +89,7 @@ class token_refresh(TokenRefreshView):
             value=new_refresh_token,
             max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
             path="/api/v1/auth",
-            domain=".spirax.me",
+            domain=".localhost",
             httponly=True,
             samesite="Lax",
             secure=True,
@@ -113,7 +113,7 @@ class logout(TokenBlacklistView):
         response.delete_cookie(
             key="refresh_token",
             path="/api/v1/auth",
-            domain=".spirax.me",
+            domain=".localhost",
             samesite="Lax",
         )
         return response

@@ -148,7 +148,7 @@ def process(imageObject, modelObject):
                 processed_image_file.seek(0)
 
         # YOLO Models (Ultralytics)
-        elif modelObject.model_name == "YOLO v11 Object Detection":
+        elif modelObject.model_name == "YOLO v11 Object Detection (Best Model)":
             # Inferencing
             results = model(image)[0]
 

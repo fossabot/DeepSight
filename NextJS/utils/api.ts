@@ -6,7 +6,7 @@ export const getCSRFToken = async (): Promise<string> => {
 
   try {
     const healthResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/health`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/v1/health`,
       {
         credentials: "include",
       },
@@ -48,7 +48,7 @@ export const getAccessToken = async (): Promise<string | null> => {
     }
 
     const refreshResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/v1/auth/token/refresh/`,
       {
         method: "POST",
         credentials: "include",
@@ -115,10 +115,13 @@ export const apiFetch = async <T>(
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
-      ...options,
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}api/v1${url}`,
+      {
+        ...options,
+        credentials: "include",
+      },
+    );
     if (response.status === 401) {
       console.error("Unauthorized request");
       return new Response(null, { status: 401 });
