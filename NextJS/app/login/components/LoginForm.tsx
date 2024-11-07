@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="login-container bg-gray-900">
-      <form onSubmit={handleLogin} className="login-form">
+      <form onSubmit={handleLogin} className="login-form relative z-10">
         <input
           type="text"
           placeholder="Username"

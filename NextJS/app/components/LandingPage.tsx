@@ -128,8 +128,8 @@ const LandingPage: React.FC = () => {
             <Image
               src="/images/get-started.png"
               alt="Get-Started"
-              width={700}
-              height={798}
+              width={600}
+              height={684}
               className="w-[90%] h-[90%] object-contain"
               priority
             />
@@ -192,8 +192,8 @@ const LandingPage: React.FC = () => {
             <Image
               src="/images/planet.png"
               alt="planet"
-              width={1500}
-              height={688}
+              width={1024}
+              height={470}
               className="rounded-[40px] w-[102%] h-[102%]"
               priority
             />

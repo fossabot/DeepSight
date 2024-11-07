@@ -17,8 +17,8 @@ if [ ! -f ".setup_complete" ]; then
   echo "Starting Deepsight application setup..."
   echo "----------------------------------------"
 
-  echo "Installing ML Libraries: TensorFlow, ONNX Runtime, and Ultralytics..."
-  pip install tensorflow-cpu==2.17.0 onnxruntime==1.19.2 ultralytics==8.3.21 --no-cache-dir --quiet || exit 1
+  echo "Installing ML Libraries: Mediapipe, ONNX Runtime, and Ultralytics..."
+  pip install mediapipe==0.10.18 onnxruntime==1.19.2 ultralytics==8.3.21 --no-cache-dir --quiet || exit 1
 
   echo "Collecting static files..."
   python manage.py collectstatic --noinput --clear || exit 1

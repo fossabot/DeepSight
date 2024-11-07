@@ -159,7 +159,7 @@ const UserProfile: React.FC = () => {
 
   return (
     <div className="profile-container bg-gray-900 p-12 text-white min-h-screen flex flex-col items-center justify-center relative pt-40 pb-10">
-      <div className="p-12 rounded-lg shadow-lg w-full max-w-xl mb-8">
+      <div className="p-12 w-full max-w-xl mb-8 relative z-10">
         <h2 className="text-3xl font-bold text-white mb-4">User Profile</h2>
 
         {notification && (
@@ -177,7 +177,7 @@ const UserProfile: React.FC = () => {
             name="username"
             value={profileData.username}
             onChange={handleInputChange}
-            className="p-2 w-full border rounded"
+            className="p-2 text-white w-full border rounded"
             placeholder="Enter username"
           />
         </div>
@@ -191,7 +191,7 @@ const UserProfile: React.FC = () => {
             name="email"
             value={profileData.email}
             onChange={handleInputChange}
-            className="p-2 w-full border rounded"
+            className="p-2 text-white w-full border rounded"
             placeholder="Enter email"
           />
         </div>
@@ -205,7 +205,7 @@ const UserProfile: React.FC = () => {
             name="first_name"
             value={profileData.first_name}
             onChange={handleInputChange}
-            className="p-2 w-full border rounded"
+            className="p-2 text-white w-full border rounded"
             placeholder="Enter first name"
           />
         </div>
@@ -219,7 +219,7 @@ const UserProfile: React.FC = () => {
             name="last_name"
             value={profileData.last_name}
             onChange={handleInputChange}
-            className="p-2 w-full border rounded"
+            className="p-2 text-white w-full border rounded"
             placeholder="Enter last name"
           />
         </div>
@@ -233,19 +233,19 @@ const UserProfile: React.FC = () => {
             name="password"
             value={profileData.password}
             onChange={handleInputChange}
-            className="p-2 w-full border rounded"
+            className="p-2 text-white w-full border rounded"
             placeholder="Enter new password if you want to change"
           />
         </div>
 
         <div className="form-group mb-6">
-          <label className="block text-sm font-bold mb-2 text-black">
+          <label className="block text-sm font-bold mb-2 text-white">
             Theme
           </label>
           <select
             value={theme}
             onChange={handleThemeChange}
-            className="p-2 w-full border rounded text-black"
+            className="p-2 w-full border rounded text-white"
           >
             <option value="systemdefault">System Default</option>
             <option value="light">Light</option>
@@ -255,7 +255,7 @@ const UserProfile: React.FC = () => {
 
         <button
           onClick={handleSave}
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+          className="profile-button p-2 rounded duration-200"
           disabled={isSaving}
         >
           {isSaving ? "Saving..." : "Save Changes"}

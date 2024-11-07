@@ -23,7 +23,7 @@
 }
 
 .model-card {
-  background-color: #2a2a2a;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   padding: 20px;
@@ -46,19 +46,19 @@
   font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 10px;
-  color: #e0e0e0;
+  color: #333;
 }
 
 .model-description {
   font-size: 1rem;
   margin-bottom: 10px;
-  color: #ccc;
+  color: #444;
 }
 
 .model-version,
 .model-category {
   font-size: 0.875rem;
-  color: #999;
+  color: #555;
 }
 
 .model-link {
@@ -66,7 +66,7 @@
   margin-top: 10px;
   padding: 10px 15px;
   background-color: #49c1d0;
-  color: #fff;
+  color: #000000;
   text-decoration: none;
   border-radius: 4px;
   transition: background-color 0.3s;

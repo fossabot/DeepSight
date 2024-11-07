@@ -7,12 +7,23 @@
   color: #fff;
 }
 
-.image-upload,
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 10px 0;
+}
+
 .uploaded-images {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 800px;
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   margin: 10px 0;
 }
 
@@ -22,7 +33,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #171d21;
+  background-color: #f9f9f9;
   border-radius: 10px;
   transition:
     background-color 0.3s,
@@ -35,7 +46,7 @@
 }
 
 .dropzone:hover {
-  background-color: #002d42;
+  background-color: #e6f7ff;
   border-color: #49c1d0;
 }
 

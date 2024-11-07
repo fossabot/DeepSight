@@ -24,5 +24,6 @@ urlpatterns = [
     path("models/<int:model_id>/", views.model_details, name="model_detail"),
     # Processed Image Related
     path("user/image/<int:image_id>/process/<int:model_id>/", views.process_image, name="process_image"),
-    path("user/processedimage/<int:processed_image_id>/", views.processed_image, name="processed_image"),
+    path("user/processedimage/", views.processed_image, name="processed_images"),
+    path("user/processedimage/<int:processed_image_id>/", views.processed_image_id, name="processed_image_id"),
 ]

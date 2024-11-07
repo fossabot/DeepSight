@@ -1,16 +1,16 @@
 import { Footer, Navbar } from "@/components";
-import ProfilePage from "./components/ProfilePage";
-import "./profile.css";
+import ViewProcessedPage from "./components/ViewProcessedPage";
+import "./view.css";
 
 export const metadata = {
-  title: "DeepSight | Home",
+  title: "DeepSight | Processed Images",
 };
 
-export default function Home() {
+export default function Process() {
   return (
     <div className="bg-primary-black">
       <Navbar redirects={["", "/login"]} />
-      <ProfilePage />
+      <ViewProcessedPage />
       <Footer />
     </div>
   );

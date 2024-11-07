@@ -5,6 +5,8 @@ import subprocess
 
 
 def download(url, dir):
+    if dir is None:
+        return
     try:
         response = requests.get(url, stream=True)
         response.raise_for_status()

@@ -138,6 +138,12 @@ const Navbar: React.FC<NavbarProps> = ({ redirects }) => {
               >
                 Process Image
               </Link>
+              <Link
+                href="/image/process/view"
+                className={`py-2 px-4 rounded-md transition duration-300 ${getButtonStyle("/image/process/view")}`}
+              >
+                Processed Images
+              </Link>
             </>
           )}
 

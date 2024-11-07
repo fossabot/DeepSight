@@ -16,10 +16,11 @@
 input {
   margin: 10px 0;
   padding: 10px;
-  border: none;
+  border: 1px solid #2c414e;
   border-radius: 5px;
   outline: none;
-  color: black;
+  color: white;
+  background-color: #1b1e20;
 }
 
 .button_non_transparent {

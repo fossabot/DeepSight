@@ -5,21 +5,18 @@ import { apiFetch } from "@/utils/api";
 
 const ProcessPage: React.FC = () => {
   const [images, setImages] = useState<{ id: string; blobUrl: string }[]>([]);
-  const [models, setModels] = useState<{ id: string; name: string }[]>([]);
+  const [models, setModels] = useState<{ id: string; model_name: string }[]>(
+    [],
+  );
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [previousProcessedImages, setPreviousProcessedImages] = useState<
-    string[]
-  >([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUploadedImages();
     fetchModels();
-    fetchPreviouslyProcessedImages();
   }, []);
 
   const fetchUploadedImages = async () => {
@@ -55,29 +52,25 @@ const ProcessPage: React.FC = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await apiFetch("/models/");
+      const response = await apiFetch(
+        "/models/",
+        { method: "GET" },
+        false,
+        true,
+        false,
+      );
       const data = await response.json();
-      setModels(data);
+      setModels(data.data);
     } catch (error) {
       console.error("Error fetching models:", error);
       setError("Failed to load models.");
     }
   };
 
-  const fetchPreviouslyProcessedImages = async () => {
-    try {
-      const response = await apiFetch("/user/image/processed/");
-      const data = await response.json();
-      setPreviousProcessedImages(data.images);
-    } catch (error) {
-      console.error("Error fetching processed images:", error);
-      setError("Failed to load previously processed images.");
-    }
-  };
-
   const handleImageClick = (imageId: string) => {
     setSelectedImageId(imageId);
-    setIsModalOpen(true);
+    setProcessedImage(null);
+    setSelectedModelId(null);
   };
 
   const handleProcess = async () => {
@@ -85,106 +78,97 @@ const ProcessPage: React.FC = () => {
 
     setProcessing(true);
     setProcessedImage(null);
+    setError(null);
 
     try {
       const response = await apiFetch(
-        `/user/image/${selectedImageId}/process/${selectedModelId}`,
+        `/user/image/${selectedImageId}/process/${selectedModelId}/`,
         { method: "POST" },
       );
 
       if (response.ok) {
-        const result = await response.json();
-        setProcessedImage(result.processed_image_url);
+        const blob = await response.blob();
+        const processedImageUrl = URL.createObjectURL(blob);
+        setProcessedImage(processedImageUrl);
       } else {
         console.error("Processing failed:", await response.json());
+        setError("Processing failed.");
       }
     } catch (error) {
       console.error("Error during processing:", error);
+      setError("An error occurred during processing.");
     } finally {
       setProcessing(false);
-      setIsModalOpen(false);
-      setSelectedModelId(null);
     }
   };
 
   return (
     <div className="process-container pt-40 pb-10">
       <h2 className="process-title">Image Processing</h2>
-      <div className="image-gallery">
+
+      <div className="image-gallery relative z-10">
         {images.length > 0 ? (
           images.map((image) => (
-            <img
+            <div
               key={image.id}
-              src={image.blobUrl}
-              alt={`Image ${image.id}`}
+              className={`image-item ${
+                selectedImageId === image.id ? "border-4 border-blue-500" : ""
+              }`}
               onClick={() => handleImageClick(image.id)}
-              className="gallery-image"
-            />
+            >
+              <img
+                src={image.blobUrl}
+                alt={`Image ${image.id}`}
+                className={`gallery-image cursor-pointer ${
+                  selectedImageId === image.id ? "selected-image" : ""
+                }`}
+              />
+            </div>
           ))
         ) : (
           <p className="text-gray-600">No images available.</p>
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Select a Model for Processing</h3>
-            <select
-              value={selectedModelId || ""}
-              onChange={(e) => setSelectedModelId(e.target.value)}
-              className="model-select"
-            >
-              <option value="" disabled>
-                Select Model
+      {selectedImageId && (
+        <div className="model-selection relative z-10">
+          <h3>Select a Model</h3>
+          <select
+            value={selectedModelId || ""}
+            onChange={(e) => setSelectedModelId(e.target.value)}
+            className="model-select"
+          >
+            <option value="" disabled>
+              Select Model
+            </option>
+            {models.map((model) => (
+              <option key={model.id} value={model.id}>
+                {model.model_name}
               </option>
-              {models.map((model) => (
-                <option key={model.id} value={model.id}>
-                  {model.name}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleProcess}
-              disabled={processing || !selectedModelId}
-              className="process-button"
-            >
-              {processing ? "Processing..." : "Process Image"}
-            </button>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="close-modal-button"
-            >
-              Cancel
-            </button>
-          </div>
+            ))}
+          </select>
+          <button
+            onClick={handleProcess}
+            disabled={processing || !selectedModelId}
+            className="process-button"
+          >
+            {processing ? "Processing..." : "Process Image"}
+          </button>
         </div>
       )}
+
+      {processing && <p className="loading-spinner">Processing...</p>}
 
       {processedImage && (
-        <div className="processed-image">
+        <div className="processed-image relative z-10">
           <h3>Processed Image</h3>
-          <img src={processedImage} alt="Processed Result" />
+          <img
+            src={processedImage}
+            alt="Processed Result"
+            className="processed-image-display"
+          />
         </div>
       )}
-
-      <div className="previous-images">
-        <h3>Previously Processed Images</h3>
-        <div className="image-gallery">
-          {previousProcessedImages.length > 0 ? (
-            previousProcessedImages.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Processed ${index}`}
-                className="gallery-image"
-              />
-            ))
-          ) : (
-            <p className="text-gray-600">No previously processed images.</p>
-          )}
-        </div>
-      </div>
 
       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>

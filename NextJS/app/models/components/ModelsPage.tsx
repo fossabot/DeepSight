@@ -70,24 +70,24 @@ const ModelsPage = () => {
   const placeholderCards = Array.from({ length: 8 }, (_, index) => (
     <div
       key={index}
-      className="model-card bg-gray-300 p-6 rounded-lg shadow-md animate-pulse"
+      className="model-card bg-white p-6 rounded-lg shadow-md animate-pulse"
     >
       <div className="model-thumbnail-container flex justify-center mb-4">
-        <div className="bg-gray-400 w-24 h-24 rounded" />
+        <div className="bg-gray-200 w-24 h-24 rounded" />
       </div>
-      <div className="h-6 bg-gray-400 rounded w-3/4 mb-2" />
-      <div className="h-4 bg-gray-400 rounded w-full mb-2" />
-      <div className="h-4 bg-gray-400 rounded w-1/2 mb-2" />
-      <div className="h-4 bg-gray-400 rounded w-2/3" />
+      <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
+      <div className="h-4 bg-gray-200 rounded w-full mb-2" />
+      <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+      <div className="h-4 bg-gray-200 rounded w-2/3" />
     </div>
   ));
 
   return (
     <div className="models-container bg-gray-900 p-8 min-h-screen flex flex-col items-center pt-40 pb-10">
-      <h1 className="text-5xl font-bold text-white mb-10 text-center">
+      <h1 className="text-5xl font-bold text-white mb-10 text-center relative z-10">
         Available Models
       </h1>
-      <div className="models-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-screen-xl">
+      <div className="models-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-screen-xl relative z-10">
         {loading ? (
           placeholderCards
         ) : error ? (
@@ -105,7 +105,7 @@ const ModelsPage = () => {
                   className="model-thumbnail w-24 h-24 rounded"
                 />
               </div>
-              <h2 className="model-name text-2xl font-semibold text-black mb-2">
+              <h2 className="model-name text-2xl font-semibold mb-2">
                 {model.model_name}
               </h2>
               <p className="model-description text-gray-700 mb-2 line-clamp-3">
@@ -119,7 +119,7 @@ const ModelsPage = () => {
               </p>
               <a
                 href={model.url}
-                className="model-link mt-4 bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                className="model-link mt-4 py-2 px-4 rounded-lg transition-colors duration-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -50,16 +50,15 @@ class Model(models.Model):
 
 
 class ProcessedImage(models.Model):
-    image = models.OneToOneField(Image, on_delete=models.CASCADE, related_name="api_processed_image")
+    image = models.ForeignKey(Image, on_delete=models.CASCADE, related_name="api_processed_images")
     model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name="api_processed_images")
     creation_date = models.DateTimeField(auto_now_add=True)
     binary_data = models.BinaryField()
     processing_time = models.DurationField(null=True, blank=True)
     output_format = models.CharField(max_length=10, blank=True)
-    processed_image_size = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"Processed Image (Original: {self.image}, Model: {self.model}, Size: {self.processed_image_size} bytes)"
+        return f"Processed Image (Original: {self.image}, Model: {self.model}"
 
 
 class UserSetting(models.Model):

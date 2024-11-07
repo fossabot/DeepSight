@@ -209,9 +209,9 @@ def image_id(request, image_id):
         return response(False, "Image not found.", {}, 404)
 
     if request.method == "GET":
-        response = HttpResponse(content=image.binary_data, content_type=image.image_format)
-        response["Content-Disposition"] = f'attachment; filename="{image.image_name}"'
-        return response
+        httpresponse = HttpResponse(content=image.binary_data, content_type=image.image_format)
+        httpresponse["Content-Disposition"] = f'attachment; filename="{image.image_name}"'
+        return httpresponse
 
     elif request.method == "DELETE":
         image.delete()
@@ -312,13 +312,25 @@ def process_image(request, image_id, model_id):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def processed_image(request, processed_image_id):
+def processed_image(request):
+    processed_images = ProcessedImage.objects.filter(image__user=request.user)
+    data = [{"id": image.id} for image in processed_images]
+    return response(True, "Processed image IDs retrieved successfully!", data, 200)
+
+
+@api_view(["GET", "DELETE"])
+@permission_classes([IsAuthenticated])
+def processed_image_id(request, processed_image_id):
     try:
-        processed_image = ProcessedImage.objects.get(id=processed_image_id)
+        processed_image = ProcessedImage.objects.get(pk=processed_image_id, image__user=request.user)
     except ProcessedImage.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Processed image not found."}, status=404)
+        return response(False, "Processed image not found.", {}, 404)
 
-    response = HttpResponse(content=processed_image.binary_data, content_type="image/jpeg")
-    response["Content-Disposition"] = f'attachment; filename="processed_image_{processed_image_id}.jpg"'
+    if request.method == "GET":
+        httpresponse = HttpResponse(content=processed_image.binary_data, content_type="image/jpeg")
+        httpresponse["Content-Disposition"] = f'attachment; filename="processed_image_{processed_image.id}.jpg"'
+        return httpresponse
 
-    return response
+    elif request.method == "DELETE":
+        processed_image.delete()
+        return response(True, "Processed image deleted successfully!", {}, 204)

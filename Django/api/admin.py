@@ -56,11 +56,10 @@ class ProcessedImageAdmin(admin.ModelAdmin):
         "model",
         "creation_date",
         "processing_time",
-        "output_format",
-        "processed_image_size",
+        "output_format"
     )
     list_filter = ("model", "output_format", "creation_date")
-    readonly_fields = ("image", "model", "creation_date", "processing_time", "output_format", "processed_image_size")
+    readonly_fields = ("image", "model", "creation_date", "processing_time", "output_format")
     search_fields = ("image__image_name", "model__model_name")
 
 

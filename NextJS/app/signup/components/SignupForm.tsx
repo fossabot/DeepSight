@@ -65,7 +65,7 @@ const SignupForm: React.FC = () => {
 
   return (
     <div className="signup-container bg-gray-900">
-      <form onSubmit={handleSignup} className="signup-form">
+      <form onSubmit={handleSignup} className="signup-form relative z-10">
         <input
           type="email"
           placeholder="Email"
