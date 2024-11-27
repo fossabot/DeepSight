@@ -27,7 +27,8 @@ docker compose up -d
 Below are Screenshots showcasing the application:
 
 * **Homepage Overview:** Overview of the application.
-![Homepage Overview](assets/homepage.png)  
+![Homepage Overview](assets/homepage.png) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FItsSpirax%2FDeepSight.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FItsSpirax%2FDeepSight?ref=badge_shield)
+ 
 <br>
 
 * **Get Started:** Introduction page to guide users on how to use the application.
@@ -67,3 +68,6 @@ The Docker images for the application can be found on Docker Hub:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FItsSpirax%2FDeepSight.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FItsSpirax%2FDeepSight?ref=badge_large)
